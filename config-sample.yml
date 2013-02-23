@@ -1,0 +1,28 @@
+# server configuration parameters
+# this file (config-sample.yml) should be copied to config.yml, otherwise it
+# will be ignored.
+
+# base server configuration
+server:
+  port: 8003
+  webDirectory: ./web
+
+# database configuration details
+database:
+  uri: mongodb://localhost/letscode
+  
+  # if no username/password is provided, login is anonymous
+  username: letscode
+  password: hunter2
+
+# prefixes for classpath scanning
+# future plugins may require their package prefixes to be added here
+prefixes:
+  mappings:
+    - net.letscode.game
+  messages:
+    - net.letscode.game.server.message
+  requestHandlers:
+    - net.letscode.game.server.message.request.handler
+  responseHandlers:
+    - net.letscode.game.server.message.response.handler

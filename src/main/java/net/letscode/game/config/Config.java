@@ -3,6 +3,8 @@ package net.letscode.game.config;
 import com.esotericsoftware.yamlbeans.YamlReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,9 @@ public class Config {
 			config = new YamlReader(reader).read(ConfigBase.class);
 			reader.close();
 		} catch (Exception ex) {
-			logger.error("Failed to load configuration from " + CONFIG_FILE, ex);
+			logger.error("Failed to load configuration from " + CONFIG_FILE
+					+ ", defaults will be used.", ex);
+			config = new ConfigBase();
 		}
 	}
 	
@@ -49,18 +53,22 @@ public class Config {
 	
 	public static class ConfigBase {
 
-		public ConfigBase() {
-		}
-		
 		public ServerConfig server;
 		public DatabaseConfig database;
+		public PrefixesConfig prefixes;
+		
+		public ConfigBase() {
+			server = new ServerConfig();
+			database = new DatabaseConfig();
+			prefixes = new PrefixesConfig();
+		}
 		
 	}
 	
 	public static class ServerConfig {
 		
 		public int port;
-		public String webDirectory = "/blahblahblah";
+		public String webDirectory = "./web";
 		
 	}
 	
@@ -72,15 +80,50 @@ public class Config {
 		
 	}
 	
+	public static class PrefixesConfig {
+	
+		public List<String> mappings = new ArrayList() {{
+			// defaults
+			add("net.letscode.game");
+		}};
+		
+		public List<String> requestHandlers = new ArrayList() {{
+			add("net.letscode.game.server.message.request.handler");
+		}};
+		
+		public List<String> responseHandlers = new ArrayList() {{
+			add("net.letscode.game.server.message.response.handler");
+		}};
+		
+	}
+	
 	public static void main(String[] args) {
 		ConfigBase base = Config.get();
 		System.out.println(base);
 		System.out.println("\tserver: " + base.server);
 		System.out.println("\t\tport: " + base.server.port);
 		System.out.println("\t\twebDirectory: " + base.server.webDirectory);
+		
 		System.out.println("\tdatabase: " + base.database);
 		System.out.println("\t\turi: " + base.database.uri);
 		System.out.println("\t\tusername: " + base.database.username);
+		
+		System.out.println("\tprefixes: " + base.prefixes);
+		
+		System.out.println("\t\tmappings: ");
+		for (String s : base.prefixes.mappings) {
+			System.out.println("\t\t\t" + s);
+		}
+		
+		System.out.println("\t\trequestHandlers: ");
+		for (String s : base.prefixes.requestHandlers) {
+			System.out.println("\t\t\t" + s);
+		}
+		
+		System.out.println("\t\tresponseHandlers: ");
+		for (String s : base.prefixes.responseHandlers) {
+			System.out.println("\t\t\t" + s);
+		}
 	}
 	
 }
