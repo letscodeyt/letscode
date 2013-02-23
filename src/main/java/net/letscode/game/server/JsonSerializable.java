@@ -5,7 +5,7 @@ import java.io.IOException;
 
 /**
  *
- * @author tim
+ * @author timothyb89
  */
 public interface JsonSerializable {
 	

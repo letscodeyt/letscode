@@ -5,9 +5,7 @@ import net.letscode.game.auth.shiro.MongoRealm;
 import net.letscode.game.config.Config;
 import net.letscode.game.db.Database;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.subject.Subject;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
@@ -32,7 +30,6 @@ public class WebServer {
 		
 		logger.info("Initializing database...");
 		db = Database.get();
-		
 		
 		logger.info("Initializing authentication...");
 		MongoRealm realm = new MongoRealm();

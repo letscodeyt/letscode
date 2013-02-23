@@ -1,6 +1,5 @@
 package net.letscode.game;
 
-import java.awt.Color;
 import net.letscode.game.server.WebServer;
 
 /**
@@ -11,7 +10,6 @@ public class App {
 
 	public static void main(String[] args) {
 		WebServer server = new WebServer();
-		Color c;
 	}
 	
 }

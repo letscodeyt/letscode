@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import net.letscode.game.server.request.AuthenticationRequest;
-import net.letscode.game.server.request.Request;
+import net.letscode.game.server.message.request.AuthenticationRequest;
+import net.letscode.game.server.message.request.Request;
 import org.eclipse.jetty.websocket.api.WebSocketConnection;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -19,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author tim
+ * 
+ * @author timothyb89
  */
 @WebSocket
 public class ClientSession {
