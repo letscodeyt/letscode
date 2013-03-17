@@ -1,17 +1,25 @@
 package net.letscode.game.server.message.response.handler;
 
-import net.letscode.game.server.ClientSession;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Represents a response sent from the client.
+ * Defines a {@code @ResponseHandler} annotation. Classes with this annotation
+ * are scanned at startup and registered with the
+ * {@link ResponseHandlerFactory}.
  * @author timothyb89
  */
-
-public class ResponseHandler {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface ResponseHandler {
 	
-	public static final String JSON_TYPE = "response";
-	
-	private ClientSession session;
-	private String requestId;
+	/**
+	 * Gets the value of the {@code name} field on an incoming request that must
+	 * be matched to trigger this {@code ResponseHandler}.
+	 * @return the request name field to match
+	 */
+	public String value();
 	
 }

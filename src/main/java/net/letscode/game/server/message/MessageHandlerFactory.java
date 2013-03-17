@@ -1,4 +1,4 @@
-package net.letscode.game.server.message.request.handler;
+package net.letscode.game.server.message;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -15,40 +15,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class handles runtime classpath scanning for {@code @RequestHandler}-
- * annotated classes, and also allows them to be instantiated by name.
- * 
- * <p>Classpath scanning specifically looks for @{@link RequestHandler}
- * annotations at the locations configured in
- * {@code Config.get().prefixes.requestHandlers}. Handlers may also be
- * registered manually with {@link register(Class)} (which must be annotated),
- * or with {@link register(String, Class)} (which does not require an
- * annotation).</p>
- * 
+ * A factory to manage the registration of all {@link MessageHandler}s. Handlers
+ * may be registered either manually via the {@link register(Class)} method,
+ * or automatically if they are annotated and within a scanning package
+ * specified in {@link Config}'s {@code prefixes.messageHandlers} field.
  * @author timothyb89
  */
-public class RequestHandlerFactory {
+public class MessageHandlerFactory {
 	
-	private static RequestHandlerFactory instance;
+	private static MessageHandlerFactory instance;
 	
-	private Logger logger = LoggerFactory.getLogger(RequestHandlerFactory.class);
+	private Logger logger = LoggerFactory.getLogger(MessageHandlerFactory.class);
 	
 	private Map<String, Class<?>> handlers;
 	
-	private RequestHandlerFactory() {
+	private MessageHandlerFactory() {
 		handlers = new HashMap<String, Class<?>>();
 		
 		initHandlers();
 	}
 	
 	/**
-	 * Gets the singleton instance of the {@code RequestHandlerFactory}. If no
+	 * Gets the singleton instance of the {@code MessageHandlerFactory}. If no
 	 * instance currently exists, one will be created.
 	 * @return the current instance
 	 */
-	public static RequestHandlerFactory get() {
+	public static MessageHandlerFactory get() {
 		if (instance == null) {
-			instance = new RequestHandlerFactory();
+			instance = new MessageHandlerFactory();
 		}
 		
 		return instance;
@@ -57,7 +51,7 @@ public class RequestHandlerFactory {
 	private void initHandlers() {
 		// build the filters
 		FilterBuilder filters = new FilterBuilder();
-		for (String s : Config.get().prefixes.requestHandlers) {
+		for (String s : Config.get().prefixes.messageHandlers) {
 			filters.include(s);
 		}
 		
@@ -65,7 +59,7 @@ public class RequestHandlerFactory {
 		// these URLs are just parts of the classpath containing the given
 		// package, and can also include classes we don't want (thus the filter)
 		Set<URL> urls = new HashSet<URL>();
-		for (String s : Config.get().prefixes.requestHandlers) {
+		for (String s : Config.get().prefixes.messageHandlers) {
 			urls.addAll(ClasspathHelper.forPackage(s));
 		}
 		
@@ -76,12 +70,14 @@ public class RequestHandlerFactory {
 				.setScanners(new TypeAnnotationsScanner()));
 		
 		// find the annotated types
-		Set<Class<?>> annotated = r.getTypesAnnotatedWith(RequestHandler.class);
+		Set<Class<?>> annotated = r.getTypesAnnotatedWith(MessageHandler.class);
 		
 		// iterate over each class, and register it
 		for (Class<?> c : annotated) {
 			register(c);
 		}
+		
+		logger.info("Registered " + + annotated.size() + " message handlers.");
 	}
 	
 	/**
@@ -89,7 +85,7 @@ public class RequestHandlerFactory {
 	 * requirements as the name is provided manually; however, they still must
 	 * meet all constructor-related requirements in order to be instantiated
 	 * properly. Note that the {@code requestName} parameter here will override
-	 * any name values defined in a {@code @RequestHandler} annotation.
+	 * any name values defined in a {@code @MessageHandler} annotation.
 	 * 
 	 * <p><b>Warning:</b> previous handlers registered with the same name will
 	 * be replaced with {@code handlerClass}.</p>
@@ -103,24 +99,24 @@ public class RequestHandlerFactory {
 	}
 	
 	/**
-	 * Attempts to register the given class as a request handler. Classes here
-	 * must be annotated with @{@link RequestHandler}, otherwise an
+	 * Attempts to register the given class as a response handler. Classes here
+	 * must be annotated with @{@link MessageHandler}, otherwise an
 	 * {@link IllegalArgumentException} will be thrown. To avoid this, use
 	 * {@link register(String, Class)} instead.
 	 * @param handlerClass the class to register
 	 */
 	public void register(Class<?> handlerClass) {
 		// make sure the annotation exists
-		if (handlerClass.isAnnotationPresent(RequestHandler.class)) {
+		if (handlerClass.isAnnotationPresent(MessageHandler.class)) {
 			// get the annotaton
-			RequestHandler h = handlerClass.getAnnotation(RequestHandler.class);
+			MessageHandler h = handlerClass.getAnnotation(MessageHandler.class);
 			
 			// get the defined handler name and register the class
 			register(h.value(), handlerClass);
 		} else {
 			// looks like somebody should've used the other method
 			throw new IllegalArgumentException(handlerClass
-					+ " has no @RequestHandler annotation defined,"
+					+ " has no @MessageHandler annotation defined,"
 					+ " use register(String, Class) instead.");
 		}
 	}

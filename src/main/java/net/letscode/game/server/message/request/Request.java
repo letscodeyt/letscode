@@ -19,13 +19,13 @@ public abstract class Request<S extends Request> implements JsonSerializable {
 	
 	private ClientSession session;
 	private String id;
-	private List<Listener> listeners;
+	private List<Listener<S>> listeners;
 	
 	public Request(ClientSession session) {
 		this.session = session;
 		
 		id = Long.toHexString(UUID.randomUUID().getLeastSignificantBits());
-		listeners = new ArrayList<Listener>();
+		listeners = new ArrayList<Listener<S>>();
 	}
 
 	public ClientSession getSession() {
@@ -38,11 +38,11 @@ public abstract class Request<S extends Request> implements JsonSerializable {
 
 	public abstract String getName();
 	
-	public List<Listener> getListeners() {
+	public List<Listener<S>> getListeners() {
 		return listeners;
 	}
 	
-	public void addListener(Listener l) {
+	public void addListener(Listener<S> l) {
 		listeners.add(l);
 	}
 
@@ -52,7 +52,7 @@ public abstract class Request<S extends Request> implements JsonSerializable {
 	 * @param l the listener to add
 	 * @return this {@code Request}
 	 */
-	public S listener(Listener l) {
+	public S listener(Listener<S> l) {
 		listeners.add(l);
 		
 		return (S) this;
@@ -95,9 +95,9 @@ public abstract class Request<S extends Request> implements JsonSerializable {
 	
 	protected abstract void serializeSubclass(JsonGenerator g) throws IOException;
 	
-	public interface Listener {
+	public interface Listener<T extends Request> {
 		
-		public void onResponseReceived(Request r, JsonNode node);
+		public void onResponseReceived(T r, JsonNode node);
 		
 	}
 	

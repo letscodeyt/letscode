@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
+import net.letscode.game.server.message.MessageDispatcher;
 import net.letscode.game.server.message.request.AuthenticationRequest;
 import net.letscode.game.server.message.request.Request;
+import net.letscode.game.server.message.request.handler.RequestMonitor;
 import org.eclipse.jetty.websocket.api.WebSocketConnection;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -30,11 +32,15 @@ public class ClientSession {
 	private JsonFactory factory;
 	private WebSocketConnection socket;
 	
-	private Map<String, Request> requests;
+	private List<SessionListener> listeners;
 	
 	public ClientSession() {
 		factory = new JsonFactory();
-		requests = new HashMap<String, Request>();
+		
+		listeners = new LinkedList<SessionListener>();
+		listeners.add(new RequestMonitor());
+		listeners.add(new MessageDispatcher());
+		
 		logger.info("Initialized");
 	}
 	
@@ -47,7 +53,7 @@ public class ClientSession {
 		
 		// immediately ask for authentication
 		try {
-			sendRequest(new AuthenticationRequest(this));
+			send(new AuthenticationRequest(this));
 		} catch (Exception ex) {
 			logger.error("Failed to send authentication request", ex);
 		}
@@ -58,6 +64,11 @@ public class ClientSession {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			JsonNode root = mapper.readTree(input);
+			
+			// notify the listeners
+			for (SessionListener l : listeners) {
+				l.onMessageReceived(this, root);
+			}
 			
 			logger.info("Message: " + root);
 		} catch (Exception ex) {
@@ -76,39 +87,33 @@ public class ClientSession {
 		return socket;
 	}
 	
+	public void addListener(SessionListener l) {
+		listeners.add(l);
+	}
+	
+	public void removeListener(SessionListener l) {
+		listeners.remove(l);
+	}
+	
 	/**
-	 * Sends a {@code JsonSerializable} to the client. Note that this method
-	 * should not be used to send instances of {@link Request} directly as they
-	 * will not be notified. If you expect a response, you should use
-	 * {@link sendRequest(Request)} instead.
+	 * Sends a {@code JsonSerializable} to the client.
 	 * @param s the object to send
 	 * @throws IOException 
 	 */
 	public void send(JsonSerializable s) throws IOException {
+		// TODO: use a WebSocketWriter here when it's been implemented by
+		// Jetty so we don't have to keep the whole message in memory.
+		
 		StringWriter writer = new StringWriter();
 		JsonGenerator g = factory.createGenerator(writer);
 		s.serialize(g);
 		g.close();
 		
 		socket.write(writer.toString());
-	}
-	
-	/**
-	 * Sends a request to this client. Requests differ from usage of
-	 * {@link send(JsonSerializable)} in that they expect a response from the
-	 * client, and will automatically be notified if and when one is received.
-	 * <p>Responses will be paired with the originating request by their
-	 * {@code id}, a randomly generated 64-bit hex string. When a
-	 * {@code response} with a matching id is sent from the client, the request
-	 * will be notified.</p>
-	 * <p>Note that while {@link send(JsonSerializable)} will actually send
-	 * the request object to the client, no notification will be dispatched if
-	 * the client responds. </p>
-	 * @param r the request to send
-	 */
-	public void sendRequest(Request r) throws IOException {
-		requests.put(r.getId(), r);
-		send(r);
+		
+		for (SessionListener l : listeners) {
+			l.onMessageSent(this, s);
+		}
 	}
 	
 }

@@ -87,12 +87,12 @@ public class Config {
 			add("net.letscode.game");
 		}};
 		
-		public List<String> requestHandlers = new ArrayList() {{
-			add("net.letscode.game.server.message.request.handler");
+		public List<String> messageHandlers = new ArrayList() {{
+			add("net.letscode.game.server.message");
 		}};
 		
 		public List<String> responseHandlers = new ArrayList() {{
-			add("net.letscode.game.server.message.response.handler");
+			add("net.letscode.game.server.message.response");
 		}};
 		
 	}
@@ -112,11 +112,6 @@ public class Config {
 		
 		System.out.println("\t\tmappings: ");
 		for (String s : base.prefixes.mappings) {
-			System.out.println("\t\t\t" + s);
-		}
-		
-		System.out.println("\t\trequestHandlers: ");
-		for (String s : base.prefixes.requestHandlers) {
 			System.out.println("\t\t\t" + s);
 		}
 		

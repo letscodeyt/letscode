@@ -22,7 +22,7 @@ prefixes:
     - net.letscode.game
   messages:
     - net.letscode.game.server.message
-  requestHandlers:
-    - net.letscode.game.server.message.request.handler
+  messageHandlers:
+    - net.letscode.game.server.message
   responseHandlers:
-    - net.letscode.game.server.message.response.handler
+    - net.letscode.game.server.message.response
