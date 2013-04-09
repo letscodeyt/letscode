@@ -1,5 +1,8 @@
 define(function(require) {
 	require("prototype");
+	
+	var RequestMessage = require("./message/request")
+	
 	var MessageDialog = require("game/ui/jq/messagedialog");
 	
 	return Class.create({
@@ -51,6 +54,10 @@ define(function(require) {
 			console.log("message: ", data);
 			
 			if (data.type === "request") {
+				
+			} else if (data.type === "response") {
+				
+			} else if (data.type === "event") {
 				
 			}
 		},

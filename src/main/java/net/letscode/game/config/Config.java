@@ -67,7 +67,7 @@ public class Config {
 	
 	public static class ServerConfig {
 		
-		public int port;
+		public int port = 8333;
 		public String webDirectory = "./web";
 		
 	}
