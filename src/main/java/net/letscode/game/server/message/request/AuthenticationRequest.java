@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import net.letscode.game.server.ClientSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A request that asks the client for authentication, and handles the response.
@@ -11,6 +13,8 @@ import net.letscode.game.server.ClientSession;
  */
 public class AuthenticationRequest extends Request<AuthenticationRequest> {
 
+	private Logger logger = LoggerFactory.getLogger(AuthenticationRequest.class);
+	
 	public AuthenticationRequest(ClientSession session) {
 		super(session);
 	}
@@ -23,6 +27,7 @@ public class AuthenticationRequest extends Request<AuthenticationRequest> {
 	@Override
 	public void onResponseReceived(JsonNode root) {
 		// look for either a register 
+		logger.info("Response received: " + root.toString());
 	}
 	
 	@Override

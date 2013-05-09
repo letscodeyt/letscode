@@ -20,9 +20,8 @@ database:
 prefixes:
   mappings:
     - net.letscode.game
-  messages:
-    - net.letscode.game.server.message
   messageHandlers:
     - net.letscode.game.server.message
+    - net.letscode.game.server.message.request.handler
   responseHandlers:
     - net.letscode.game.server.message.response

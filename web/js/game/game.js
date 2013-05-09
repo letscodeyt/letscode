@@ -6,7 +6,7 @@ define(function(require) {
 	
 	var Game = Class.create({
 		initialize: function() {
-			Game.instance = this; // ugly singleton
+			window.game = this; // ugly singleton
 			
 			this.bounds = new gamejs.Rect(0, 0, 800, 480);
 			

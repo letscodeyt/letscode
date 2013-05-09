@@ -15,18 +15,22 @@ define(function(require) {
 		initialize: function($super) {
 			$super();
 			
+			this.authListeners = [];
+			
 			var buttons = [];
 			var aligner = new Aligner({
 				bounds: new gamejs.Rect(580, 20, 200, 440),
 				components: buttons
 			});
 			
+			var $this = this;
+			
 			var loginButton = new Button({
 				text: "Login",
 				height: 50,
 				listener: function() {
-					/*var d = new DialogForm({
-						title: "Test Dialog",
+					var d = new DialogForm({
+						title: "Login",
 						fields: {
 							"Username": {
 								name: "username",
@@ -38,18 +42,22 @@ define(function(require) {
 							}
 						},
 						buttons: [{
-								text: "Test",
+								text: "Login",
 								click: function() {
-									alert("You entered: " + d.get("test"));
+									$this.notify({
+										type: "login",
+										username: d.get("username"),
+										password: d.get("password")
+									});
+									d.close();
 								}
 							}, {
-								text: "Close",
+								text: "Cancel",
 								click: function() {
 									d.close();
 								}
 							}]
-					});*/
-					MessageDialog.info("TODO login");
+					});
 				}
 			});
 			buttons.push(loginButton);
@@ -70,6 +78,16 @@ define(function(require) {
 		
 		draw: function($super, surface) {
 			$super(surface);
+		},
+		
+		authListener: function(l) {
+			this.authListeners.push(l);
+		},
+		
+		notify: function(data) {
+			this.authListeners.forEach(function(l) {
+				l(data);
+			}, this);
 		}
 
 	});

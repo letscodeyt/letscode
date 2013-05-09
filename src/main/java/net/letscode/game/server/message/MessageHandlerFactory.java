@@ -113,6 +113,8 @@ public class MessageHandlerFactory {
 			
 			// get the defined handler name and register the class
 			register(h.value(), handlerClass);
+			
+			logger.info("Registered message handler: " + handlerClass.getName());
 		} else {
 			// looks like somebody should've used the other method
 			throw new IllegalArgumentException(handlerClass

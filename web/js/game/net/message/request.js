@@ -4,9 +4,8 @@ define(function(require) {
 	var Message = require("./message");
 	
 	var RequestMessage = Class.create(Message, {
-		initialize: function($super, name, data) {
+		initialize: function($super, name) {
 			this.name = name;
-			this.data = data;
 			
 			// generate a uuid, via stackoverflow 
 			// http://stackoverflow.com/a/105078
@@ -29,7 +28,7 @@ define(function(require) {
 			this.listeners.push(callback);
 		},
 		
-		handleResponse: function(resp) {
+		notify: function(resp) {
 			var $this = this;
 			
 			this.listeners.forEach(function(callback) {
@@ -46,12 +45,16 @@ define(function(require) {
 			// can be overridden by subclasses
 		},
 		
+		getData: function() {
+			// to be overridden by subclasses
+		},
+		
 		serialize: function() {
 			return JSON.stringify({
 				id: this.id,
 				type: "request",
 				name: this.name,
-				data: this.data
+				data: this.getData()
 			});
 		}
 	});

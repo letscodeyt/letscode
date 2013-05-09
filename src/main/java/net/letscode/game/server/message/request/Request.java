@@ -86,6 +86,7 @@ public abstract class Request<S extends Request> implements JsonSerializable {
 		
 		g.writeStringField("type", JSON_TYPE);
 		g.writeStringField("name", getName());
+		g.writeStringField("id", getId());
 		
 		g.writeFieldName("data");
 		serializeSubclass(g);
