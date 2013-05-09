@@ -12,7 +12,8 @@ import net.letscode.game.server.message.MessageDispatcher;
 import net.letscode.game.server.message.request.AuthenticationRequest;
 import net.letscode.game.server.message.request.Request;
 import net.letscode.game.server.message.request.handler.RequestMonitor;
-import org.eclipse.jetty.websocket.api.WebSocketConnection;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -25,12 +26,11 @@ import org.slf4j.LoggerFactory;
  * @author timothyb89
  */
 @WebSocket
-public class ClientSession {
+public class ClientSession extends WebSocketAdapter {
 	
 	private Logger logger = LoggerFactory.getLogger(ClientSession.class);
 	
 	private JsonFactory factory;
-	private WebSocketConnection socket;
 	
 	private List<SessionListener> listeners;
 	
@@ -43,13 +43,10 @@ public class ClientSession {
 		
 		logger.info("Initialized");
 	}
-	
-	@OnWebSocketConnect
-	public void onConnect(WebSocketConnection socket) {
-		this.socket = socket;
-		
-		logger.info("Client " + socket.getRemoteAddress() +  " connected, "
-				+ "protocol: " + socket.getSubProtocol());
+
+	@Override
+	public void onWebSocketConnect(Session sess) {
+		logger.info("Client " + sess.getRemoteAddress() +  " connected");
 		
 		// immediately ask for authentication
 		try {
@@ -58,9 +55,9 @@ public class ClientSession {
 			logger.error("Failed to send authentication request", ex);
 		}
 	}
-	
-	@OnWebSocketMessage
-	public void onMessage(String input) {
+
+	@Override
+	public void onWebSocketText(String input) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			JsonNode root = mapper.readTree(input);
@@ -75,16 +72,12 @@ public class ClientSession {
 			logger.error("Error parsing client message", ex);
 		}
 	}
-	
-	@OnWebSocketClose
-	public void onClose(int status, String reason) {
+
+	@Override
+	public void onWebSocketClose(int statusCode, String reason) {
 		logger.info("Client " + socket.getRemoteAddress() + " closed connection, "
 				+ "status: " + status + ", "
 				+ "reason: " + reason);
-	}
-
-	public WebSocketConnection getSocket() {
-		return socket;
 	}
 	
 	public void addListener(SessionListener l) {
@@ -109,7 +102,8 @@ public class ClientSession {
 		s.serialize(g);
 		g.close();
 		
-		socket.write(writer.toString());
+		// TODO: Fixme
+		getSession().s(writer.toString());
 		
 		for (SessionListener l : listeners) {
 			l.onMessageSent(this, s);

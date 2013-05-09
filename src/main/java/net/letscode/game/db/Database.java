@@ -36,6 +36,8 @@ public class Database {
 		try {
 			DatabaseConfig config = Config.get().database;
 			
+			logger.info("Connecting database: " + config.uri);
+			
 			MongoURI uri = new MongoURI(config.uri);
 			mongo = new Mongo(uri);
 			

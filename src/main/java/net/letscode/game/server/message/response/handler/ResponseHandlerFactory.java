@@ -49,18 +49,14 @@ public class ResponseHandlerFactory {
 	}
 
 	private void initHandlers() {
-		// build the filters
-		FilterBuilder filters = new FilterBuilder();
-		for (String s : Config.get().prefixes.responseHandlers) {
-			filters.include(s);
-		}
-		
-		// build the necessary URLs
+		// build the URLs and filters
 		// these URLs are just parts of the classpath containing the given
 		// package, and can also include classes we don't want (thus the filter)
 		Set<URL> urls = new HashSet<URL>();
-		for (String s : Config.get().prefixes.responseHandlers) {
+		FilterBuilder filters = new FilterBuilder();
+		for (String s : Config.get().prefixes.messageHandlers) {
 			urls.addAll(ClasspathHelper.forPackage(s));
+			filters = filters.include(FilterBuilder.prefix(s + "."));
 		}
 		
 		// init Reflections

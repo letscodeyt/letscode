@@ -11,7 +11,7 @@ define(function(require) {
 			this.font = new gamejs.font.Font("36px Arial");
 			this.subFont = new gamejs.font.Font("16px Courier sans-serif");
 			
-			this.game = require("game/game").instance;
+			this.game = window.game;
 			
 			this.text = "connecting";
 			this.dots = "";
@@ -44,8 +44,8 @@ define(function(require) {
 			var statusSize = statusText.getSize();
 			var statusX = (surfaceSize[0] / 2) - (statusSize[0] / 2);
 			
-			var mainY = (surfaceSize[1] / 2)
-					- (mainSize[1] + statusSize[1] + 5) / 2;
+			var mainY = (surfaceSize[1] / 2) 
+			            - (mainSize[1] + statusSize[1] + 5) / 2;
 			var statusY = mainY + mainSize[1] + 5;
 			
 			surface.blit(mainText, [mainX, mainY]);

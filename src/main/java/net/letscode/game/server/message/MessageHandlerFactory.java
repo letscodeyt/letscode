@@ -49,18 +49,14 @@ public class MessageHandlerFactory {
 	}
 
 	private void initHandlers() {
-		// build the filters
-		FilterBuilder filters = new FilterBuilder();
-		for (String s : Config.get().prefixes.messageHandlers) {
-			filters.include(s);
-		}
-		
-		// build the necessary URLs
+		// build the URLs and filters
 		// these URLs are just parts of the classpath containing the given
 		// package, and can also include classes we don't want (thus the filter)
 		Set<URL> urls = new HashSet<URL>();
+		FilterBuilder filters = new FilterBuilder();
 		for (String s : Config.get().prefixes.messageHandlers) {
 			urls.addAll(ClasspathHelper.forPackage(s));
+			filters = filters.include(FilterBuilder.prefix(s + "."));
 		}
 		
 		// init Reflections
@@ -113,8 +109,6 @@ public class MessageHandlerFactory {
 			
 			// get the defined handler name and register the class
 			register(h.value(), handlerClass);
-			
-			logger.info("Registered message handler: " + handlerClass.getName());
 		} else {
 			// looks like somebody should've used the other method
 			throw new IllegalArgumentException(handlerClass
