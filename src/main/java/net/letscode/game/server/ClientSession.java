@@ -10,13 +10,9 @@ import java.util.LinkedList;
 import java.util.List;
 import net.letscode.game.server.message.MessageDispatcher;
 import net.letscode.game.server.message.request.AuthenticationRequest;
-import net.letscode.game.server.message.request.Request;
 import net.letscode.game.server.message.request.handler.RequestMonitor;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +33,17 @@ public class ClientSession extends WebSocketAdapter {
 	public ClientSession() {
 		factory = new JsonFactory();
 		
-		listeners = new LinkedList<SessionListener>();
+		listeners = new LinkedList<>();
 		listeners.add(new RequestMonitor());
 		listeners.add(new MessageDispatcher());
 		
 		logger.info("Initialized");
 	}
-
+	
 	@Override
 	public void onWebSocketConnect(Session sess) {
+		super.onWebSocketConnect(sess);
+		
 		logger.info("Client " + sess.getRemoteAddress() +  " connected");
 		
 		// immediately ask for authentication
@@ -58,6 +56,8 @@ public class ClientSession extends WebSocketAdapter {
 
 	@Override
 	public void onWebSocketText(String input) {
+		super.onWebSocketText(input);
+		
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			JsonNode root = mapper.readTree(input);
@@ -75,9 +75,20 @@ public class ClientSession extends WebSocketAdapter {
 
 	@Override
 	public void onWebSocketClose(int statusCode, String reason) {
-		logger.info("Client " + socket.getRemoteAddress() + " closed connection, "
-				+ "status: " + status + ", "
+		super.onWebSocketClose(statusCode, reason);
+		
+		logger.info("Client " + getSession().getRemoteAddress() + " "
+				+ "closed connection, "
+				+ "status: " + statusCode + ", "
 				+ "reason: " + reason);
+	}
+
+	@Override
+	public void onWebSocketError(Throwable cause) {
+		super.onWebSocketError(cause);
+		
+		logger.error(
+				"WebSocket error in " + getSession().getRemoteAddress(), cause);
 	}
 	
 	public void addListener(SessionListener l) {
@@ -93,21 +104,29 @@ public class ClientSession extends WebSocketAdapter {
 	 * @param s the object to send
 	 * @throws IOException 
 	 */
-	public void send(JsonSerializable s) throws IOException {
+	public void send(JsonSerializable s) {
 		// TODO: use a WebSocketWriter here when it's been implemented by
 		// Jetty so we don't have to keep the whole message in memory.
 		
-		StringWriter writer = new StringWriter();
-		JsonGenerator g = factory.createGenerator(writer);
-		s.serialize(g);
-		g.close();
-		
-		// TODO: Fixme
-		getSession().s(writer.toString());
-		
-		for (SessionListener l : listeners) {
-			l.onMessageSent(this, s);
+		try {
+			// this throws an IOException but should never happen as no real
+			// IO occurs
+			StringWriter writer = new StringWriter();
+			JsonGenerator g = factory.createGenerator(writer);
+			s.serialize(g);
+			g.close();
+
+			// TODO: Fixme
+			getRemote().sendStringByFuture(writer.toString());
+
+			for (SessionListener l : listeners) {
+				l.onMessageSent(this, s);
+			}
+		} catch (IOException ex) {
+			logger.error("Error sending message", ex);
 		}
 	}
+	
+	
 	
 }

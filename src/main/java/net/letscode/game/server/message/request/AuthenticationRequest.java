@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import net.letscode.game.server.ClientSession;
+import net.letscode.game.server.message.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +27,35 @@ public class AuthenticationRequest extends Request<AuthenticationRequest> {
 
 	@Override
 	public void onResponseReceived(JsonNode root) {
-		// look for either a register 
-		logger.info("Response received: " + root.toString());
+		// look for either a login or register message
+		if (!root.has("data")) {
+			getSession().send(Notification.error("Malformed message"));
+			return;
+		}
+		
+		JsonNode data = root.get("data");
+		
+		switch (data.path("type").asText()) {
+			case "login":
+				handleLogin(
+						data.path("username").asText(),
+						data.path("password").asText());
+				break;
+			case "register":
+				
+			default:
+				getSession().send(Notification.error("Invalid auth type"));
+				break;
+		}
+		
+	}
+	
+	private void handleLogin(String username, String password) {
+		
+	}
+	
+	private void handleRegistration(String username, String password, String email) {
+		
 	}
 	
 	@Override

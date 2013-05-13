@@ -19,6 +19,11 @@ public abstract class User {
 	private String username;
 	
 	/**
+	 * This user's email address
+	 */
+	private String email;
+	
+	/**
 	 * The hashed password for this user.
 	 */
 	private String password;
@@ -32,8 +37,8 @@ public abstract class User {
 	private List<String> permissions;
 	
 	public User() {
-		roles = new ArrayList<String>();
-		permissions = new ArrayList<String>();
+		roles = new ArrayList<>();
+		permissions = new ArrayList<>();
 	}
 	
 	/**
@@ -47,8 +52,8 @@ public abstract class User {
 		
 		hashPassword(password);
 		
-		roles = new ArrayList<String>();
-		permissions = new ArrayList<String>();
+		roles = new ArrayList<>();
+		permissions = new ArrayList<>();
 	}
 
 	/**
@@ -65,6 +70,14 @@ public abstract class User {
 		this.username = username;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
 	public String getPassword() {
 		return password;
 	}
