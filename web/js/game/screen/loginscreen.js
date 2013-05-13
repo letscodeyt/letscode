@@ -67,7 +67,54 @@ define(function(require) {
 				text: "Register",
 				height: 50,
 				listener: function() {
-					MessageDialog.info("TODO register");
+					var d = new DialogForm({
+						title: "Register",
+						fields: {
+							"Username": {
+								name: "username",
+								type: "text"
+							},
+							"Email Address": {
+								name: "email",
+								type: "email"
+							},
+							"Password": {
+								name: "password",
+								type: "password"
+							},
+							"Repeat": {
+								name: "repeat",
+								type: "password"
+							}
+						},
+						buttons: [{
+								text: "Login",
+								click: function() {
+									// do some quick password validation
+									var p = d.get("password");
+									var r = d.get("repeat");
+									
+									if (p !== r) {
+										MessageDialog.error(
+												"Passwords do not match.");
+										return;
+									}
+									
+									$this.notify({
+										type: "register",
+										username: d.get("username"),
+										email: d.get("email"),
+										password: d.get("password")
+									});
+									d.close();
+								}
+							}, {
+								text: "Cancel",
+								click: function() {
+									d.close();
+								}
+							}]
+					});
 				}
 			});
 			buttons.push(registerButton);

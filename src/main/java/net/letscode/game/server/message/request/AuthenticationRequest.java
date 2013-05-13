@@ -42,7 +42,10 @@ public class AuthenticationRequest extends Request<AuthenticationRequest> {
 						data.path("password").asText());
 				break;
 			case "register":
-				
+				handleRegister(
+						data.path("username").asText(),
+						data.path("email").asText(),
+						data.path("password").asText());
 			default:
 				getSession().send(Notification.error("Invalid auth type"));
 				break;
@@ -54,7 +57,7 @@ public class AuthenticationRequest extends Request<AuthenticationRequest> {
 		
 	}
 	
-	private void handleRegistration(String username, String password, String email) {
+	private void handleRegister(String username, String password, String email) {
 		
 	}
 	
