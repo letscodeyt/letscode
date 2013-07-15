@@ -1,5 +1,6 @@
 package net.letscode.game.auth.shiro;
 
+import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.auth.User;
 import net.letscode.game.db.Database;
 import org.apache.shiro.authc.AuthenticationException;
@@ -9,8 +10,6 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An authentication realm backed by the resident mongodb instance. The realm
@@ -19,11 +18,10 @@ import org.slf4j.LoggerFactory;
  * among other things.
  * @author timothyb89
  */
+@Slf4j
 public class MongoRealm extends AuthorizingRealm {
 
 	public static final String NAME = "mongo";
-	
-	private Logger logger = LoggerFactory.getLogger(MongoRealm.class);
 	
 	public MongoRealm() {
 		HashedCredentialsMatcher m = new HashedCredentialsMatcher("SHA-256");
@@ -42,11 +40,11 @@ public class MongoRealm extends AuthorizingRealm {
 
 		User u = Database.get().getUser(username);
 		if (u == null) {
-			logger.info("User not found: " + username);
+			log.info("User not found: " + username);
 			return null; // no user found
 		}
 		
-		logger.info("User found: " + u);
+		log.info("User found: " + u);
 
 		// make sure we actually got a ShiroUser
 		// this will always happen unless we add some sort of different user
@@ -61,7 +59,7 @@ public class MongoRealm extends AuthorizingRealm {
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		for (Object o : principals.asList()) {
-			logger.info("Authorz Principal class: " + o.getClass());
+			log.info("Authorz Principal class: " + o.getClass());
 			
 			// assume a String username for now, but we may add different auth
 			// types in the future, e.g. private key for saved logins, etc
@@ -77,6 +75,8 @@ public class MongoRealm extends AuthorizingRealm {
 			// type in the future
 			if (u instanceof ShiroUser) {
 				return (ShiroUser) u;
+			} else {
+				log.error("Invalid user class: " + u.getClass().getName());
 			}
 		}
 		

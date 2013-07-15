@@ -16,7 +16,7 @@ public class RequestRegistry {
 	private Map<String, Request> requests;
 	
 	private RequestRegistry() {
-		requests = new HashMap<String, Request>();
+		requests = new HashMap<>();
 	}
 	
 	public static RequestRegistry get() {

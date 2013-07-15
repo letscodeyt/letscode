@@ -1,6 +1,7 @@
 package net.letscode.game.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.letscode.game.api.util.JsonSerializable;
 
 /**
  * A small interface used to listen for message events that occur within a

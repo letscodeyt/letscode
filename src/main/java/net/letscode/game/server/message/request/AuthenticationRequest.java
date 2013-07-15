@@ -3,18 +3,16 @@ package net.letscode.game.server.message.request;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.server.ClientSession;
 import net.letscode.game.server.message.Notification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A request that asks the client for authentication, and handles the response.
  * @author timothyb89
  */
+@Slf4j
 public class AuthenticationRequest extends Request<AuthenticationRequest> {
-
-	private Logger logger = LoggerFactory.getLogger(AuthenticationRequest.class);
 	
 	public AuthenticationRequest(ClientSession session) {
 		super(session);
@@ -46,6 +44,7 @@ public class AuthenticationRequest extends Request<AuthenticationRequest> {
 						data.path("username").asText(),
 						data.path("email").asText(),
 						data.path("password").asText());
+				break;
 			default:
 				getSession().send(Notification.error("Invalid auth type"));
 				break;
@@ -54,11 +53,12 @@ public class AuthenticationRequest extends Request<AuthenticationRequest> {
 	}
 	
 	private void handleLogin(String username, String password) {
-		
+		log.info("Attempting to login " + username);
+		getSession().send(Notification.error("omg wat"));
 	}
 	
 	private void handleRegister(String username, String password, String email) {
-		
+		log.info("Attempting to register " + username);
 	}
 	
 	@Override

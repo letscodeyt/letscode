@@ -1,11 +1,10 @@
 package net.letscode.game.server.message.request.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.server.ClientSession;
 import net.letscode.game.server.message.MessageHandler;
 import net.letscode.game.server.message.request.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link MessageHandler} that manages the dispatching of incoming responses
@@ -13,10 +12,9 @@ import org.slf4j.LoggerFactory;
  * @see RequestHandlerFactory
  * @author timothyb89
  */
+@Slf4j
 @MessageHandler("response")
 public class RequestDispatcher {
-	
-	private Logger logger = LoggerFactory.getLogger(RequestDispatcher.class);
 	
 	/**
 	 * Constructs a RequestDispatcher. This constructor will automatically be
@@ -28,7 +26,7 @@ public class RequestDispatcher {
 	public RequestDispatcher(ClientSession session, JsonNode message) {
 		// check for an id field
 		if (!message.has("id")) {
-			logger.warn("Client response missing id: " + message);
+			log.warn("Client response missing id: " + message);
 			// TODO: notify the client of the error?
 			return;
 		}
@@ -38,7 +36,7 @@ public class RequestDispatcher {
 		// query the RequestRegistry
 		Request r = RequestRegistry.get().get(id);
 		if (r == null) {
-			logger.warn("No request found with id " + id + ": " + message);
+			log.warn("No request found with id " + id + ": " + message);
 			return;
 		}
 		

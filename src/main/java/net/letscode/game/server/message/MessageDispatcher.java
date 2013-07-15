@@ -2,8 +2,8 @@ package net.letscode.game.server.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.lang.reflect.Constructor;
+import net.letscode.game.api.util.JsonSerializable;
 import net.letscode.game.server.ClientSession;
-import net.letscode.game.server.JsonSerializable;
 import net.letscode.game.server.SessionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

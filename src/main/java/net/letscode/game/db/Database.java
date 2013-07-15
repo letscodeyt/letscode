@@ -9,24 +9,22 @@ import com.google.code.morphia.logging.slf4j.SLF4JLogrImplFactory;
 import com.mongodb.Mongo;
 import com.mongodb.MongoURI;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.auth.User;
 import net.letscode.game.auth.shiro.ShiroUser;
 import net.letscode.game.config.Config;
 import net.letscode.game.config.Config.DatabaseConfig;
 import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A database wrapper class, intended to abstract as much of the database as
  * possible from other code.
  * @author timothyb89
  */
+@Slf4j
 public class Database {
 	
 	private static Database instance;
-	
-	private Logger logger = LoggerFactory.getLogger(Database.class);
 	
 	private Mongo mongo;
 	private Morphia morphia;
@@ -36,7 +34,7 @@ public class Database {
 		try {
 			DatabaseConfig config = Config.get().database;
 			
-			logger.info("Connecting database: " + config.uri);
+			log.info("Connecting database: " + config.uri);
 			
 			MongoURI uri = new MongoURI(config.uri);
 			mongo = new Mongo(uri);
@@ -59,7 +57,7 @@ public class Database {
 			ds.ensureCaps();
 			ds.ensureIndexes();
 		} catch (Exception ex) {
-			logger.error("Error initializing database", ex);
+			log.error("Error initializing database", ex);
 		}
 	}
 	
@@ -71,7 +69,7 @@ public class Database {
 	private void initMappings() {
 		Reflections r = new Reflections("net.letscode.game");
 		for (Class c : r.getTypesAnnotatedWith(Entity.class)) {
-			logger.info("Mapping class " + c);
+			log.info("Mapping class " + c);
 			morphia.map(c);
 		}
 	}

@@ -14,7 +14,6 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.util.ByteSource;
-import org.apache.shiro.util.SimpleByteSource;
 
 /**
  * A User implementation that is compatible with Apache Shiro authentication.

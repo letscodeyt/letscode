@@ -1,4 +1,4 @@
-package net.letscode.game.server;
+package net.letscode.game.api.util;
 
 /**
  * Defines basic functionality for JSON deserialization.

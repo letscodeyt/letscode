@@ -16,9 +16,14 @@ define(function(require) {
 			this.status = "disconnected";
 			
 			this.messageListeners = [];
+			this.statusListeners = [];
 			this.initListeners();
 		},
 		
+		/**
+		 * Initializes some essential MessageListeners, including basic handlers
+		 * for authentication.
+		 */
 		initListeners: function() {
 			this.messageListener({
 				type: "request",
@@ -26,6 +31,17 @@ define(function(require) {
 				callback: function(message) {
 					console.log("creating AuthResponse for ", message);
 					new AuthenticationResponse(message);
+				}
+			});
+			
+			this.messageListener({
+				type: "notification",
+				callback: function(message) {
+					console.log("notification: " + message);
+					new MessageDialog({
+						type: message.class,
+						text: message.message
+					});
 				}
 			});
 		},
@@ -66,19 +82,25 @@ define(function(require) {
 			var data = JSON.parse(event.data);
 			console.log("message: ", data);
 			
-			// notify all listers, filtering non-matches
+			// notify all listers, filtering fields that don't match
+			// start by iterating over each listener...
 			this.messageListeners.forEach(function(l) {
 				var notify = true;
 				
+				// then look at every property in the listener
 				for (var prop in l) {
+					// skip inherited properties
 					if (!l.hasOwnProperty(prop)) {
 						continue;
 					}
 					
+					// skip the 'callback' field
 					if (prop === "callback") {
 						continue;
 					}
 					
+					// if the listener's property doesn't exist, or doesn't
+					// match, the match fails
 					if (!data.hasOwnProperty(prop) || data[prop] !== l[prop]) {
 						notify = false;
 						console.log("match failed: ", l, data, "prop: " + prop);
@@ -110,10 +132,36 @@ define(function(require) {
 		 * filtering, such that the callback with only be notified if all extra
 		 * listener properties exist on and match those of the incoming
 		 * message.</p>
-		 * @param {type} listener
+		 * @param {function} listener
 		 */
 		messageListener: function(listener) {
 			this.messageListeners.push(listener);
+		},
+		
+		/**
+		 * Adds the given function to the list of callbacks to be executed when
+		 * a status change event has occurred. Specifically, this refers to the
+		 * value of the <code>status</code> field in this 
+		 * @param {function} listener the callback function to execute when the
+		 *     even has been triggered
+		 */
+		statusListener: function(listener) {
+			this.statusListeners.push(listener);
+		},
+		
+		/**
+		 * Sets the current connection status. This is only intended for
+		 * internal use; to monitor the status field for changes use the
+		 * <code>statusListener</code> function to add a callback.
+		 * @param {string} status the new status string
+		 */
+		setStatus: function(status) {
+			var oldStatus = this.status;
+			this.status = status;
+			
+			this.statusListeners.forEach(function(l) {
+				l(status, oldStatus);
+			}, this);
 		},
 		
 		send: function(o) {

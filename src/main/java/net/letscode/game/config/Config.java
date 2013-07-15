@@ -5,20 +5,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handles loading and saving of server configuration in YAML files.
  * @author timothyb89
  */
+@Slf4j
 public class Config {
 	
 	public static final File CONFIG_FILE = new File("config.yml");
 	
 	private static Config instance;
-	
-	private Logger logger = LoggerFactory.getLogger(Config.class);
 	
 	private ConfigBase config;
 	
@@ -27,13 +25,11 @@ public class Config {
 	}
 	
 	private void _load() {
-		logger.debug("Loading configuration from " + CONFIG_FILE);
-		try {
-			FileReader reader = new FileReader(CONFIG_FILE);
+		log.debug("Loading configuration from " + CONFIG_FILE);
+		try (FileReader reader = new FileReader(CONFIG_FILE)) {
 			config = new YamlReader(reader).read(ConfigBase.class);
-			reader.close();
 		} catch (Exception ex) {
-			logger.error("Failed to load configuration from " + CONFIG_FILE
+			log.error("Failed to load configuration from " + CONFIG_FILE
 					+ ", defaults will be used.", ex);
 			config = new ConfigBase();
 		}

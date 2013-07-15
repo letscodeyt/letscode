@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import net.letscode.game.api.util.JsonSerializable;
 import net.letscode.game.server.ClientSession;
-import net.letscode.game.server.JsonSerializable;
 
 /**
  * Represents a request that can be sent to the client. 
@@ -25,7 +25,7 @@ public abstract class Request<S extends Request> implements JsonSerializable {
 		this.session = session;
 		
 		id = Long.toHexString(UUID.randomUUID().getLeastSignificantBits());
-		listeners = new ArrayList<Listener<S>>();
+		listeners = new ArrayList<>();
 	}
 
 	public ClientSession getSession() {

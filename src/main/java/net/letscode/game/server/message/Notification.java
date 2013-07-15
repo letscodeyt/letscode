@@ -2,7 +2,7 @@ package net.letscode.game.server.message;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
-import net.letscode.game.server.JsonSerializable;
+import net.letscode.game.api.util.JsonSerializable;
 
 /**
  * A simple message type for notification. 

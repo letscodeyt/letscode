@@ -2,10 +2,9 @@ package net.letscode.game.server.message.response.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.lang.reflect.Constructor;
+import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.server.ClientSession;
 import net.letscode.game.server.message.MessageHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Handles the dispatching of incoming requests to their required
@@ -14,10 +13,9 @@ import org.slf4j.LoggerFactory;
  * the mapping of type names to actual server-side classes.
  * @author timothyb89
  */
+@Slf4j
 @MessageHandler("request")
 public class ResponseDispatcher {
-	
-	private Logger logger = LoggerFactory.getLogger(ResponseDispatcher.class);
 	
 	/**
 	 * Constructs a ResponseDispatcher. This constructor will automatically be
@@ -30,7 +28,7 @@ public class ResponseDispatcher {
 	public ResponseDispatcher(ClientSession session, JsonNode node) {
 		// check for a 'name' field
 		if (!node.has("name")) {
-			logger.warn("Invalid request from client: " + node);
+			log.warn("Invalid request from client: " + node);
 			// TODO: notify the client of the error?
 			return;
 		}
@@ -38,7 +36,7 @@ public class ResponseDispatcher {
 		// check for an id field - if there's no id, we won't be able to send
 		// a response, so why bother creating one?
 		if (!node.has("id")) {
-			logger.warn("Invalid request from client is missing id: " + node);
+			log.warn("Invalid request from client is missing id: " + node);
 			return;
 		}
 		
@@ -47,7 +45,7 @@ public class ResponseDispatcher {
 		// query the factory to get the class
 		Class<?> clazz = ResponseHandlerFactory.get().getHandler(name);
 		if (clazz == null) {
-			logger.warn("Invalid request name: " + name);
+			log.warn("Invalid request name: " + name);
 			return;
 		}
 		
@@ -56,7 +54,7 @@ public class ResponseDispatcher {
 					ClientSession.class, JsonNode.class);
 			c.newInstance(session, node); // we can ignore the return value
 		} catch (Exception ex) {
-			logger.error("Missing (ClientSession, JsonNode) constructor in: "
+			log.error("Missing (ClientSession, JsonNode) constructor in: "
 					+ clazz);
 		}
 	}

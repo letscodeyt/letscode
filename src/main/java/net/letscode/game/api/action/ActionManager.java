@@ -1,17 +1,15 @@
 package net.letscode.game.api.action;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Manages the 
  * @author timothyb89
  */
+@Slf4j
 public class ActionManager {
 	
 	private static ActionManager instance;
-	
-	private Logger logger = LoggerFactory.getLogger(ActionManager.class);
 	
 	private ActionManager() {
 		

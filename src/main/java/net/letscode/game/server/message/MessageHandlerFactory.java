@@ -5,14 +5,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.config.Config;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A factory to manage the registration of all {@link MessageHandler}s. Handlers
@@ -21,16 +20,15 @@ import org.slf4j.LoggerFactory;
  * specified in {@link Config}'s {@code prefixes.messageHandlers} field.
  * @author timothyb89
  */
+@Slf4j
 public class MessageHandlerFactory {
 	
 	private static MessageHandlerFactory instance;
 	
-	private Logger logger = LoggerFactory.getLogger(MessageHandlerFactory.class);
-	
 	private Map<String, Class<?>> handlers;
 	
 	private MessageHandlerFactory() {
-		handlers = new HashMap<String, Class<?>>();
+		handlers = new HashMap<>();
 		
 		initHandlers();
 	}
@@ -52,7 +50,7 @@ public class MessageHandlerFactory {
 		// build the URLs and filters
 		// these URLs are just parts of the classpath containing the given
 		// package, and can also include classes we don't want (thus the filter)
-		Set<URL> urls = new HashSet<URL>();
+		Set<URL> urls = new HashSet<>();
 		FilterBuilder filters = new FilterBuilder();
 		for (String s : Config.get().prefixes.messageHandlers) {
 			urls.addAll(ClasspathHelper.forPackage(s));
@@ -73,7 +71,7 @@ public class MessageHandlerFactory {
 			register(c);
 		}
 		
-		logger.info("Registered " + + annotated.size() + " message handlers.");
+		log.info("Registered " + + annotated.size() + " message handlers.");
 	}
 	
 	/**

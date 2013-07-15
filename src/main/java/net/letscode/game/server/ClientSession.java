@@ -8,23 +8,22 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import net.letscode.game.api.util.JsonSerializable;
 import net.letscode.game.server.message.MessageDispatcher;
 import net.letscode.game.server.message.request.AuthenticationRequest;
 import net.letscode.game.server.message.request.handler.RequestMonitor;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
  * @author timothyb89
  */
+@Slf4j
 @WebSocket
 public class ClientSession extends WebSocketAdapter {
-	
-	private Logger logger = LoggerFactory.getLogger(ClientSession.class);
 	
 	private JsonFactory factory;
 	
@@ -37,20 +36,20 @@ public class ClientSession extends WebSocketAdapter {
 		listeners.add(new RequestMonitor());
 		listeners.add(new MessageDispatcher());
 		
-		logger.info("Initialized");
+		log.info("Initialized");
 	}
 	
 	@Override
 	public void onWebSocketConnect(Session sess) {
 		super.onWebSocketConnect(sess);
 		
-		logger.info("Client " + sess.getRemoteAddress() +  " connected");
+		log.info("Client " + sess.getRemoteAddress() +  " connected");
 		
 		// immediately ask for authentication
 		try {
 			send(new AuthenticationRequest(this));
 		} catch (Exception ex) {
-			logger.error("Failed to send authentication request", ex);
+			log.error("Failed to send authentication request", ex);
 		}
 	}
 
@@ -62,14 +61,14 @@ public class ClientSession extends WebSocketAdapter {
 		try {
 			JsonNode root = mapper.readTree(input);
 			
+			log.info("Message: " + root);
+			
 			// notify the listeners
 			for (SessionListener l : listeners) {
 				l.onMessageReceived(this, root);
 			}
-			
-			logger.info("Message: " + root);
 		} catch (Exception ex) {
-			logger.error("Error parsing client message", ex);
+			log.error("Error parsing client message", ex);
 		}
 	}
 
@@ -77,7 +76,7 @@ public class ClientSession extends WebSocketAdapter {
 	public void onWebSocketClose(int statusCode, String reason) {
 		super.onWebSocketClose(statusCode, reason);
 		
-		logger.info("Client " + getSession().getRemoteAddress() + " "
+		log.info("Client " + getSession().getRemoteAddress() + " "
 				+ "closed connection, "
 				+ "status: " + statusCode + ", "
 				+ "reason: " + reason);
@@ -87,7 +86,7 @@ public class ClientSession extends WebSocketAdapter {
 	public void onWebSocketError(Throwable cause) {
 		super.onWebSocketError(cause);
 		
-		logger.error(
+		log.error(
 				"WebSocket error in " + getSession().getRemoteAddress(), cause);
 	}
 	
@@ -123,10 +122,8 @@ public class ClientSession extends WebSocketAdapter {
 				l.onMessageSent(this, s);
 			}
 		} catch (IOException ex) {
-			logger.error("Error sending message", ex);
+			log.error("Error sending message", ex);
 		}
 	}
-	
-	
 	
 }
