@@ -2,11 +2,10 @@ package net.letscode.game.server.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.lang.reflect.Constructor;
-import net.letscode.game.api.util.JsonSerializable;
+import lombok.extern.slf4j.Slf4j;
+import net.letscode.game.event.EventHandler;
 import net.letscode.game.server.ClientSession;
-import net.letscode.game.server.SessionListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.letscode.game.server.message.event.IncomingMessageEvent;
 
 /**
  * A {@code SessionListener} that handles the dispatching of all incoming
@@ -14,20 +13,16 @@ import org.slf4j.LoggerFactory;
  * {@link MessageHandler}s via their {@code type} field
  * @author timothyb89
  */
-public class MessageDispatcher implements SessionListener {
+@Slf4j
+public class MessageDispatcher {
 
-	private Logger logger = LoggerFactory.getLogger(MessageDispatcher.class);
-	
-	@Override
-	public void onMessageSent(ClientSession client, JsonSerializable s) {
-		// ignore
-	}
-
-	@Override
-	public void onMessageReceived(ClientSession client, JsonNode node) {
+	@EventHandler
+	public void onMessageReceived(IncomingMessageEvent event) {
+		JsonNode node = event.getMessage();
+		
 		// check the message type
 		if (!node.has("type")) {
-			logger.warn("Message has no defined type: " + node);
+			log.warn("Message has no defined type: " + node);
 			// TODO: notify the client?
 			return;
 		}
@@ -36,19 +31,19 @@ public class MessageDispatcher implements SessionListener {
 		
 		Class<?> clazz = MessageHandlerFactory.get().getHandler(type);
 		if (clazz == null) {
-			logger.warn("No handler registered for type " + type);
+			log.warn("No handler registered for type " + type);
 			return;
 		}
 		
 		try {
 			Constructor c = clazz.getConstructor(
 					ClientSession.class, JsonNode.class);
-			c.newInstance(client, node); // ignore the actual instance
+			c.newInstance(event.getClient(), node); // ignore the actual instance
 		} catch (NoSuchMethodException ex) {
-			logger.error("Class " + clazz + " has no (ClientSession, JsonNode) "
+			log.error("Class " + clazz + " has no (ClientSession, JsonNode) "
 					+ "constructor", ex);
 		} catch (Exception ex) {
-			logger.error("Could not initialize MessageHandler: " + clazz, ex);
+			log.error("Could not initialize MessageHandler: " + clazz, ex);
 		}
 	}
 	

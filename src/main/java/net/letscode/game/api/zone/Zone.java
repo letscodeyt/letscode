@@ -2,9 +2,13 @@ package net.letscode.game.api.zone;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import net.letscode.game.api.entity.Entity;
 import net.letscode.game.api.util.TargetedSerializable;
+import net.letscode.game.event.EventBus;
+import net.letscode.game.event.EventBusClient;
+import net.letscode.game.event.EventBusProvider;
 
 /**
  * A zone is an abstract collection of entities. 
@@ -12,10 +16,54 @@ import net.letscode.game.api.util.TargetedSerializable;
  * additional classes within this package for examples.</p>
  * @author timothyb89
  */
-public class Zone implements TargetedSerializable<Entity> {
+public class Zone implements TargetedSerializable<Entity>, EventBusProvider {
 	
+	protected EventBus bus;
+	
+	/**
+	 * The list of entities contained in this zone.
+	 */
 	private List<Entity> entities; 
-
+	
+	public Zone() {
+		bus = new EventBus();
+		entities = new LinkedList<>();
+	}
+	
+	@Override
+	public EventBusClient bus() {
+		return bus.getClient();
+	}
+	
+	/**
+	 * Adds the given entity to this zone.
+	 * @param entity 
+	 */
+	public void addEntity(Entity entity) {
+		entities.add(entity);
+	}
+	
+	/**
+	 * Removes the given entity from this zone. 
+	 * @param entity 
+	 */
+	public void removeEntity(Entity entity) {
+		entities.remove(entity);
+	}
+	
+	/**
+	 * Checks if this zone contains the given entity. 
+	 * @param entity
+	 * @return 
+	 */
+	public boolean containsEntity(Entity entity) {
+		return entities.contains(entity);
+	}
+	
+	//
+	// serialization specifics
+	//
+	
 	/**
 	 * Serializes the list of entities for this zone into a JSON array. Note
 	 * that this simply produces a field value and not an actual field, and is
@@ -27,7 +75,7 @@ public class Zone implements TargetedSerializable<Entity> {
 			throws IOException {
 		g.writeArrayFieldStart("entities");
 		
-		// check t
+		// check target; if null, don't call serializeFor() for entities
 		if (target == null) {
 			for (Entity e : entities) {
 				e.serialize(g);

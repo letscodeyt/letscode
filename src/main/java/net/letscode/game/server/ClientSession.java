@@ -1,16 +1,19 @@
 package net.letscode.game.server;
 
+import net.letscode.game.server.message.event.OutgoingMessageEvent;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.api.util.JsonSerializable;
+import net.letscode.game.event.EventBus;
+import net.letscode.game.event.EventBusClient;
+import net.letscode.game.event.EventBusProvider;
 import net.letscode.game.server.message.MessageDispatcher;
+import net.letscode.game.server.message.event.IncomingMessageEvent;
 import net.letscode.game.server.message.request.AuthenticationRequest;
 import net.letscode.game.server.message.request.handler.RequestMonitor;
 import org.eclipse.jetty.websocket.api.Session;
@@ -18,25 +21,44 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 /**
- * 
+ * Defines a ClientSession. A {@code ClientSession} handles the base interaction
+ * with each client session. Specifically, this entails processing incoming and
+ * outgoing messages and ensuring that they are passed to the necessary event
+ * processing classes. For specific details on how this occurs, see the
+ * {@link RequestMonitor} and the {@link MessageDispatcher}.
  * @author timothyb89
  */
 @Slf4j
 @WebSocket
-public class ClientSession extends WebSocketAdapter {
+public class ClientSession extends WebSocketAdapter implements EventBusProvider {
 	
 	private JsonFactory factory;
 	
-	private List<SessionListener> listeners;
+	private EventBus bus;
+	
+	private RequestMonitor monitor;
+	private MessageDispatcher dispatcher;
 	
 	public ClientSession() {
 		factory = new JsonFactory();
 		
-		listeners = new LinkedList<>();
-		listeners.add(new RequestMonitor());
-		listeners.add(new MessageDispatcher());
+		bus = new EventBus() {{
+			add(IncomingMessageEvent.class);
+			add(OutgoingMessageEvent.class);
+		}};
+		
+		monitor = new RequestMonitor();
+		bus.register(monitor);
+		
+		dispatcher = new MessageDispatcher();
+		bus.register(dispatcher);
 		
 		log.info("Initialized");
+	}
+	
+	@Override
+	public EventBusClient bus() {
+		return bus.getClient();
 	}
 	
 	@Override
@@ -64,9 +86,7 @@ public class ClientSession extends WebSocketAdapter {
 			log.info("Message: " + root);
 			
 			// notify the listeners
-			for (SessionListener l : listeners) {
-				l.onMessageReceived(this, root);
-			}
+			bus.push(new IncomingMessageEvent(this, root));
 		} catch (Exception ex) {
 			log.error("Error parsing client message", ex);
 		}
@@ -90,14 +110,6 @@ public class ClientSession extends WebSocketAdapter {
 				"WebSocket error in " + getSession().getRemoteAddress(), cause);
 	}
 	
-	public void addListener(SessionListener l) {
-		listeners.add(l);
-	}
-	
-	public void removeListener(SessionListener l) {
-		listeners.remove(l);
-	}
-	
 	/**
 	 * Sends a {@code JsonSerializable} to the client.
 	 * @param s the object to send
@@ -118,9 +130,7 @@ public class ClientSession extends WebSocketAdapter {
 			// TODO: Fixme
 			getRemote().sendStringByFuture(writer.toString());
 
-			for (SessionListener l : listeners) {
-				l.onMessageSent(this, s);
-			}
+			bus.push(new OutgoingMessageEvent(this, s));
 		} catch (IOException ex) {
 			log.error("Error sending message", ex);
 		}

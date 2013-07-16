@@ -8,6 +8,4 @@ import net.letscode.game.api.zone.Zone;
  */
 public class ChatZone extends Zone {
 	
-	
-	
 }

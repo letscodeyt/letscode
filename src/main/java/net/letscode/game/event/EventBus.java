@@ -3,10 +3,12 @@ package net.letscode.game.event;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Defines an event bus that handles the dispatching of events to 
+ * Defines an event bus that handles the dispatching of events to client
+ * classes.
  * @author timothyb89
  */
 @Slf4j
@@ -14,8 +16,16 @@ public class EventBus {
 	
 	private List<EventQueueDefinition> definitions;
 	
+	/**
+	 * Client-safe interface for the event bus
+	 */
+	@Getter
+	private EventBusClient client;
+	
 	public EventBus() {
 		definitions = new ArrayList<>();
+		
+		client = new EventBusClient(this);
 	}
 	
 	/**
@@ -117,6 +127,7 @@ public class EventBus {
 	/**
 	 * Registers all methods of the given object annotated with
 	 * {@link EventHandler}.
+	 * @see EventBus#registerMethod(Object, Method, int)
 	 * @param o the object to process
 	 */
 	public void register(Object o) {
