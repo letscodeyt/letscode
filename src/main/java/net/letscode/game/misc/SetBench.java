@@ -25,19 +25,18 @@ public class SetBench extends Object {
 		System.out.println("Testing: " + collection.getClass().getSimpleName());
 		AdditionTest add = new AdditionTest();
 		add.run();
-		System.out.printf("Addition took %.2f seconds (%f ms / element)\n",
-				add.seconds, add.time / collection.size());
-		System.out.printf("[%d elements were added]\n", collection.size());
+		System.out.printf("Addition took %.2f ms (%f ms / element)\n",
+				add.time, add.time / collection.size());
 		
 		IterationTest iter = new IterationTest();
 		iter.run();
-		System.out.printf("Iteration took %.2f seconds (%f ms / element)\n",
-				iter.seconds, iter.time / collection.size());
+		System.out.printf("Iteration took %.2f ms (%f ms / element)\n",
+				iter.time, iter.time / collection.size());
 		
 		LookupTest lookup = new LookupTest();
 		lookup.run();
-		System.out.printf("Lookup took %.2f seconds (%f ms / element)\n", 
-				lookup.seconds, lookup.time / collection.size());
+		System.out.printf("Lookup took %.2f ms (%f ms / element)\n", 
+				lookup.time, lookup.time / collection.size());
 		
 		System.out.println();
 	}
@@ -116,10 +115,19 @@ public class SetBench extends Object {
 	}
 	
 	public static void main(String[] args) {
+		System.out.println("No initial capacity");
+		System.out.println("===================");
 		new SetBench(new ArrayList<Integer>());
 		new SetBench(new LinkedList<Integer>());
 		new SetBench(new HashSet<Integer>());
 		new SetBench(new LinkedHashSet<Integer>());
+		
+		System.out.println("Initial capacity of 100000");
+		System.out.println("==========================");
+		new SetBench(new ArrayList<Integer>(100000));
+		new SetBench(new LinkedList<Integer>());
+		new SetBench(new HashSet<Integer>(100000));
+		new SetBench(new LinkedHashSet<Integer>(100000));
 	}
 	
 }

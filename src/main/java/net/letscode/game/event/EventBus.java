@@ -31,7 +31,8 @@ import lombok.extern.slf4j.Slf4j;
  * lower (more negative) priority.</p>
  * <p>Events may also be 'vetoed', in the sense that an event at a higher
  * priority may prevent handlers further down in the queue from being executed.
- * While </p>
+ * While useful, this should be used with caution to ensure potentially
+ * important events may still get an opportunity to be notified.</p>
  * @author timothyb89
  */
 @Slf4j
@@ -100,7 +101,9 @@ public class EventBus {
 	 */
 	public void push(Event event) {
 		EventQueueDefinition def = getQueueForClass(event.getClass());
-		getQueueForClass(event.getClass()).push(event);
+		if (def != null) {
+			def.push(event);
+		}
 	}
 	
 	/**
