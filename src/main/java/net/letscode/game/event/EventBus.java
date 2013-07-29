@@ -8,7 +8,30 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Defines an event bus that handles the dispatching of events to client
- * classes.
+ * classes. The owner class can define "buckets" or queues for subclasses of
+ * {@link Event}, which may then be joined by client classes. The owner can then
+ * push an instance of the {@code Event} to the bus using {@link #push(Event)}
+ * which will notify all registered classes listening for that event type, or
+ * any of its superclasses.
+ * <p>This implementation allows for inherited and overridden event types,
+ * assuming that each superclass has defined a queue specifically for that type.
+ * When listeners are registered, they are added to all queues 'compatible' with
+ * their event type, meaning that they will be placed into the event queue for
+ * their direct event type, and any assignable superclasses. Then, when an event
+ * is pushed to the queue, only the queue for that exact type is notified. This
+ * ensures that listeners will only ever receive a single notification for
+ * events compatible via multiple superclasses.</p>
+ * <p>Definition of listeners requires the {@link EventHandler} annotation. When
+ * some client class calls {@link #register(Object)}, all methods with an
+ * {@code @EventHandler} annotation are scanned and added to the appropriate
+ * event queues.</p>
+ * <p>{@code @EventHandler} takes an optional {@code priority} parameter. Events
+ * with a higher priority (defined either as an integer or preferably using a
+ * constant in {@link EventPriority}) will be notified before events with a
+ * lower (more negative) priority.</p>
+ * <p>Events may also be 'vetoed', in the sense that an event at a higher
+ * priority may prevent handlers further down in the queue from being executed.
+ * While </p>
  * @author timothyb89
  */
 @Slf4j
@@ -76,6 +99,7 @@ public class EventBus {
 	 * @param event the event to push
 	 */
 	public void push(Event event) {
+		EventQueueDefinition def = getQueueForClass(event.getClass());
 		getQueueForClass(event.getClass()).push(event);
 	}
 	
@@ -94,8 +118,11 @@ public class EventBus {
 	 * an event queue has been created for that event type.</p>
 	 * @param o an instance of the class containing the method <code>m</code>
 	 * @param m the method to register
+	 * @param priority the event priority
+	 * @param vetoable vetoable flag
 	 */
-	protected void registerMethod(Object o, Method m, int priority) {
+	protected void registerMethod(
+			Object o, Method m, int priority, boolean vetoable) {
 		// check the parameter types, and attempt to resolve the event
 		// type
 		if (m.getParameterTypes().length != 1) {
@@ -116,9 +143,11 @@ public class EventBus {
 		// add the method to all assignable definitions.
 		// this may result in the method being added to multiple queues,
 		// that is, the queues for each superclass.
+		// (this is intended and is fundamentally what makes subclassed events
+		// work as expected)
 		for (EventQueueDefinition d : definitions) {
 			if (param.isAssignableFrom(d.getEventType())) {
-				d.getQueue().add(new EventQueueEntry(o, m, priority));
+				d.getQueue().add(new EventQueueEntry(o, m, priority, vetoable));
 				log.debug("Added {} to queue {}", m, d.getEventType());
 			}
 		}
@@ -136,8 +165,9 @@ public class EventBus {
 				// get the priority from the annotation
 				EventHandler h = m.getAnnotation(EventHandler.class);
 				int priority = h.priority();
+				boolean vetoable = h.vetoable();
 				
-				registerMethod(o, m, priority);
+				registerMethod(o, m, priority, vetoable);
 			}
 		}
 	}

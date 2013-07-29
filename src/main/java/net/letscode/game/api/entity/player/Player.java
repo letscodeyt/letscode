@@ -1,4 +1,4 @@
-package net.letscode.game.api.player;
+package net.letscode.game.api.entity.player;
 
 /**
  *

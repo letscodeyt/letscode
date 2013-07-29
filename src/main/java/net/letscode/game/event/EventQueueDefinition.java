@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  *
- * @author tim
+ * @author timothyb89
  */
 @Slf4j
 public class EventQueueDefinition {
@@ -24,14 +24,22 @@ public class EventQueueDefinition {
 	}
 	
 	public void push(Event event) {
+		boolean vetoed = false;
+		
 		for (EventQueueEntry e : queue) {
 			log.debug("Notifying listener: ", e.getMethod());
+			
+			// if the event has been vetoed, and this event is vetoable,
+			// skip it
+			if (vetoed && e.isVetoable()) {
+				continue;
+			}
 			
 			try {
 				e.notify(event);
 			} catch (EventVetoException ex) {
-				// skip on event veto
-				break;
+				// skip others on event veto
+				vetoed = true;
 			}
 		}
 	}

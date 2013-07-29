@@ -19,11 +19,16 @@ public class EventQueueEntry implements Comparable<EventQueueEntry> {
 	
 	@Getter
 	private int priority;
+	
+	@Getter
+	private boolean vetoable;
 
-	public EventQueueEntry(Object object, Method method, int priority) {
+	public EventQueueEntry(
+			Object object, Method method, int priority, boolean vetoable) {
 		this.object = object;
 		this.method = method;
 		this.priority = priority;
+		this.vetoable = vetoable;
 	}
 	
 	@Override
