@@ -32,7 +32,7 @@ define(function(require) {
 		 * @param {Object} info
 		 */
 		infoEntered: function(info) {
-			console.log(this.request)
+			console.log(this.request);
 			
 			this.game.connection.send({
 				type: "response",

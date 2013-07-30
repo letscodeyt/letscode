@@ -1,5 +1,6 @@
 package net.letscode.game.server;
 
+import net.letscode.game.server.client.ClientSession;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;

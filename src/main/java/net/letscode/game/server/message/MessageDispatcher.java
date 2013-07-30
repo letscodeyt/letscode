@@ -3,9 +3,13 @@ package net.letscode.game.server.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.lang.reflect.Constructor;
 import lombok.extern.slf4j.Slf4j;
+import net.letscode.game.event.EventBus;
+import net.letscode.game.event.EventBusClient;
+import net.letscode.game.event.EventBusProvider;
 import net.letscode.game.event.EventHandler;
-import net.letscode.game.server.ClientSession;
-import net.letscode.game.server.message.event.IncomingMessageEvent;
+import net.letscode.game.server.client.ClientSession;
+import net.letscode.game.server.client.IncomingMessageEvent;
+import net.letscode.game.server.message.incoming.AbstractMessageEvent;
 
 /**
  * A {@code SessionListener} that handles the dispatching of all incoming
@@ -14,8 +18,14 @@ import net.letscode.game.server.message.event.IncomingMessageEvent;
  * @author timothyb89
  */
 @Slf4j
-public class MessageDispatcher {
+public class MessageDispatcher implements EventBusProvider {
 
+	private EventBus bus;
+	
+	public MessageDispatcher() {
+		bus = new EventBus();
+	}
+	
 	@EventHandler
 	public void onMessageReceived(IncomingMessageEvent event) {
 		JsonNode node = event.getMessage();
@@ -38,13 +48,26 @@ public class MessageDispatcher {
 		try {
 			Constructor c = clazz.getConstructor(
 					ClientSession.class, JsonNode.class);
-			c.newInstance(event.getClient(), node); // ignore the actual instance
+			Object o = c.newInstance(event.getClient(), node);
+			
+			// if the object is an Event instance, push it to the event bus
+			if (o instanceof AbstractMessageEvent) {
+				AbstractMessageEvent ame = (AbstractMessageEvent) o;
+				bus.push(ame);
+			}
 		} catch (NoSuchMethodException ex) {
 			log.error("Class " + clazz + " has no (ClientSession, JsonNode) "
 					+ "constructor", ex);
+		} catch (MalformedMessageException ex) {
+			log.error("Client message was malformed", ex);
 		} catch (Exception ex) {
 			log.error("Could not initialize MessageHandler: " + clazz, ex);
 		}
+	}
+
+	@Override
+	public EventBusClient bus() {
+		return bus.getClient();
 	}
 	
 }

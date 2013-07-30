@@ -1,9 +1,9 @@
-package net.letscode.game.server.message.event;
+package net.letscode.game.server.client;
 
 import lombok.Data;
 import net.letscode.game.api.util.JsonSerializable;
 import net.letscode.game.event.Event;
-import net.letscode.game.server.ClientSession;
+import net.letscode.game.server.client.ClientSession;
 
 /**
  * Defines parameters for an OutgoingMessageEvent. Outgoing message events are

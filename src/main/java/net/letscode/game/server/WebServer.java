@@ -19,6 +19,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 @Slf4j
 public class WebServer {
 	
+	private static WebServer instance;
+	
 	private Database db;
 	
 	private Server server;
@@ -44,6 +46,14 @@ public class WebServer {
 		} catch (Exception ex) {
 			log.error("Failed to start server", ex);
 		}
+	}
+
+	public static WebServer getInstance() {
+		if (instance == null) {
+			instance = new WebServer();
+		}
+		
+		return instance;
 	}
 	
 	private void initConnectors() {

@@ -1,15 +1,20 @@
 package net.letscode.game.api.zone.chat;
 
+import lombok.Data;
+import net.letscode.game.api.entity.Entity;
+
 /**
- *
+ * Defines the basic properties for a ChatMessage.
  * @author timothyb89
  */
+@Data
 public class ChatMessage {
 	
+	public static final String TYPE_ACTION = "action";
+	public static final String TYPE_NORMAL = "shout";
 	
-	
-	public enum MessageType {
-		
-	}
+	private final Entity sender;
+	private final String text;
+	private final String type;
 	
 }

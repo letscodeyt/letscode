@@ -2,7 +2,7 @@ package net.letscode.game.server.message.request.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
-import net.letscode.game.server.ClientSession;
+import net.letscode.game.server.client.ClientSession;
 import net.letscode.game.server.message.MessageHandler;
 import net.letscode.game.server.message.request.Request;
 

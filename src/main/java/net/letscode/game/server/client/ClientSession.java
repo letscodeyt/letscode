@@ -1,20 +1,22 @@
-package net.letscode.game.server;
+package net.letscode.game.server.client;
 
-import net.letscode.game.server.message.event.OutgoingMessageEvent;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.StringWriter;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.letscode.game.api.entity.Entity;
 import net.letscode.game.api.util.JsonSerializable;
+import net.letscode.game.auth.User;
 import net.letscode.game.event.EventBus;
 import net.letscode.game.event.EventBusClient;
 import net.letscode.game.event.EventBusProvider;
 import net.letscode.game.server.message.MessageDispatcher;
-import net.letscode.game.server.message.event.IncomingMessageEvent;
-import net.letscode.game.server.message.request.AuthenticationRequest;
+import net.letscode.game.server.message.outgoing.StateChangeMessage;
 import net.letscode.game.server.message.request.handler.RequestMonitor;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
@@ -37,7 +39,31 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 	private EventBus bus;
 	
 	private RequestMonitor monitor;
-	private MessageDispatcher dispatcher;
+	
+	@Getter
+	private MessageDispatcher dispatcher; // TODO: make this more global-er?
+	
+	/**
+	 * The user object, set during the login process. 
+	 */
+	@Getter
+	@Setter
+	private User user;
+	
+	/**
+	 * The player adapter, which handles registration of player Controller
+	 * implementations.
+	 */
+	@Getter
+	private PlayerAdapter adapter;
+	
+	/**
+	 * The selected entity for this client session. Note that this can be any
+	 * entity in particular - the actual character entities for the user are
+	 * stored in the {@link #user} object which is set during the login process.
+	 */
+	@Getter
+	private Entity entity;
 	
 	public ClientSession() {
 		factory = new JsonFactory();
@@ -45,6 +71,9 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 		bus = new EventBus() {{
 			add(IncomingMessageEvent.class);
 			add(OutgoingMessageEvent.class);
+			add(EntitySelectionEvent.class);
+			// Login event?
+			// Logout event?
 		}};
 		
 		monitor = new RequestMonitor();
@@ -52,6 +81,8 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 		
 		dispatcher = new MessageDispatcher();
 		bus.register(dispatcher);
+		
+		adapter = new PlayerAdapter(this);
 		
 		log.info("Initialized");
 	}
@@ -61,18 +92,30 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 		return bus.getClient();
 	}
 	
+	//
+	// networking / websocket functions
+	//
+	
 	@Override
 	public void onWebSocketConnect(Session sess) {
 		super.onWebSocketConnect(sess);
 		
 		log.info("Client " + sess.getRemoteAddress() +  " connected");
 		
+		// TODO: get authentication working
+		/*
 		// immediately ask for authentication
 		try {
 			send(new AuthenticationRequest(this));
 		} catch (Exception ex) {
 			log.error("Failed to send authentication request", ex);
 		}
+		*/
+		
+		// for now, we'll just use a dummy entity and immediately put the player
+		// into the game
+		setEntity(new Entity());		
+		send(new StateChangeMessage(StateChangeMessage.STATE_ZONE));
 	}
 
 	@Override
@@ -134,6 +177,25 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 		} catch (IOException ex) {
 			log.error("Error sending message", ex);
 		}
+	}
+	
+	//
+	// player session methods
+	//
+	
+	/**
+	 * Sets the entity that this client is associated with. This will fire an
+	 * {@link EntitySelectionEvent}.
+	 * @return the previous entity, if any
+	 */
+	public Entity setEntity(Entity entity) {
+		Entity old = entity;
+		
+		this.entity = entity;
+		
+		bus.push(new EntitySelectionEvent(this, old, entity));
+		
+		return old;
 	}
 	
 }

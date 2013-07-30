@@ -2,8 +2,10 @@ package net.letscode.game.api.entity;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import net.letscode.game.api.util.TargetedSerializable;
 import net.letscode.game.api.zone.Zone;
 import net.letscode.game.event.EventBus;
@@ -12,7 +14,8 @@ import net.letscode.game.event.EventBusProvider;
 
 /**
  * Defines a basic entity. An entity is essentially some server-side object,
- * unique only in that it is capable of joining a zone. 
+ * unique only in that it is capable of joining a zone. Additionally, entities
+ * have controllers that allow them to perform actions within the zone.
  * @author timothyb89
  */
 public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
@@ -24,10 +27,14 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 	 */
 	private List<Zone> zones;
 	
+	private Map<Class<? extends Controller>, Controller> controllers;
+	
 	protected EventBus bus;
 	
 	public Entity() {
 		zones = new LinkedList<>();
+		
+		controllers = new HashMap<>();
 		
 		bus = new EventBus() {{
 			add(EntityZoneEnteredEvent.class);
@@ -75,12 +82,68 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 	 * this entity has been removed from the zone. Specifically, this removes
 	 * the zone from the internal zone list, and fires a
 	 * {@link EntityZoneExitedEvent}.
-	 * @param zone 
+	 * @param zone the zone that was exited
 	 */
 	public void _exitedZone(Zone zone) {
 		zones.add(zone);
 		
 		bus.push(new EntityZoneExitedEvent(this, zone));
+	}
+	
+	/**
+	 * Gets the controller that provides an implementation for the given class.
+	 * While there is no strict requirement as to the actual type of class
+	 * provided, by convention it should be the highest-level interface that
+	 * can provide the required functionality, and not a concrete class.
+	 * @param <T> the controller type
+	 * @param clazz the class for which to get a Controller instance
+	 * @return a Controller implementation for the given class, or null
+	 */
+	public <T extends Controller> T getController(Class<T> clazz) {
+		return (T) controllers.get(clazz);
+	}
+	
+	/**
+	 * Registers the given implementation of a controller for the given
+	 * controller class. Note that the implementation must be a subclass of the
+	 * specified controller class, otherwise an {@link IllegalArgumentException}
+	 * will be thrown. Once set, the given controller is immediately activated
+	 * (specifically, {@link Controller#onActivated(Entity)} is called) and it
+	 * can begin functioning. Any existing controller will first be deactivated,
+	 * and then returned.
+	 * @param <T> the controller type to register
+	 * @param clazz the class to provide an implementation for
+	 * @param impl the implementation to active
+	 * @return the previous Controller implementation, or {@code null} if none
+	 *     exists.
+	 * @throws IllegalArgumentException when an invalid controller type is
+	 *     provided
+	 */
+	public <T extends Controller> T setController(
+			Class<T> clazz, Controller impl) {
+		// the controller class is checked at runtime, so it's safe to cast
+		// later
+		if (!clazz.isAssignableFrom(impl.getClass())) {
+			throw new IllegalArgumentException(
+					"Attempted to register an incompatible controller for the "
+					+ "controller class " + clazz);
+		}
+		
+		Controller old = controllers.get(clazz);
+		if (old != null) {
+			old.onDeactivated(this);
+		}
+		
+		controllers.put(clazz, impl);
+		impl.onActivated(this);
+		
+		if (old == null) {
+			return null;
+		}
+		
+		// we know that this should be castable, assuming that it was originally
+		// set using this method
+		return (T) old;
 	}
 	
 	protected void serializeInternal(JsonGenerator g) throws IOException {

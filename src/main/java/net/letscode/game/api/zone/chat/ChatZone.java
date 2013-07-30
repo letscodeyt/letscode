@@ -19,7 +19,7 @@ public class ChatZone extends Zone {
 	 * {@link ChatZoneExitedEvent} with the given {@code message}.
 	 * @see Zone#removeEntity(Entity) 
 	 * @param entity the entity to remove from the zone
-	 * @param message 
+	 * @param message the zone parting message
 	 */
 	public void removeEntity(Entity entity, String message) {
 		entities.remove(entity);
@@ -57,6 +57,22 @@ public class ChatZone extends Zone {
 		bus.push(new ChatZoneExitedEvent(this, entity, message));
 	}
 	
+	/**
+	 * @param message the message to push to the zone
+	 */
+	public void chat(ChatMessage message) {
+		bus.push(new ChatZoneMessageEvent(this, message));
+	}
 	
+	/**
+	 * Gets the active chat controller, if any, for the given entity. This is a
+	 * short wrapper for {@link Entity#getController(Class)}.
+	 * @see Entity#getController(Class) 
+	 * @param e the entity for which to get a ChatController
+	 * @return the {@code ChatController} for the given entity, or {@code null}
+	 */
+	public ChatController getChatController(Entity e) {
+		return e.getController(ChatController.class);
+	}
 	
 }

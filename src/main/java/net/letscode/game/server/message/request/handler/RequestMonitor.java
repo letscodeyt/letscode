@@ -2,7 +2,7 @@ package net.letscode.game.server.message.request.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.event.EventHandler;
-import net.letscode.game.server.message.event.OutgoingMessageEvent;
+import net.letscode.game.server.client.OutgoingMessageEvent;
 import net.letscode.game.server.message.request.Request;
 
 /**

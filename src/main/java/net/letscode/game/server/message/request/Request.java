@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import net.letscode.game.api.util.JsonSerializable;
-import net.letscode.game.server.ClientSession;
+import net.letscode.game.server.client.ClientSession;
 
 /**
  * Represents a request that can be sent to the client. 

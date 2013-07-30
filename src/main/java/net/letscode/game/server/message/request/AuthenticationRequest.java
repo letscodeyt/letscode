@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import net.letscode.game.server.ClientSession;
+import net.letscode.game.server.client.ClientSession;
 import net.letscode.game.server.message.Notification;
 
 /**

@@ -125,5 +125,13 @@ public class MessageHandlerFactory {
 	public Class<?> getHandler(String requestName) {
 		return handlers.get(requestName);
 	}
+
+	/**
+	 * Gets the map of all types to handlers.
+	 * @return the map of all types to handlers
+	 */
+	public Map<String, Class<?>> getHandlers() {
+		return handlers;
+	}
 	
 }

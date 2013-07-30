@@ -12,20 +12,14 @@ import net.letscode.game.event.ContextualEvent;
 public class ChatZoneMessageEvent extends ContextualEvent<ChatZone> {
 	
 	/**
-	 * The entity that sent the message.
-	 */
-	@Getter
-	private final Entity sender;
-	
-	/**
 	 * The actual text of the message that was sent.
 	 */
 	@Getter
-	private final String message;
+	private final ChatMessage message;
 
-	public ChatZoneMessageEvent(ChatZone context, Entity sender, String message) {
+	public ChatZoneMessageEvent(ChatZone context, ChatMessage message) {
 		super(context);
-		this.sender = sender;
+		
 		this.message = message;
 	}
 	
