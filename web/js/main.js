@@ -39,8 +39,8 @@ Array.prototype.remove = function(from, to) {
  * @param {type} gamejs the loaded gamejs instance
  * @param Game the loaded Game class
  */
-require(["domReady!", "gamejs", "game/game"], function(doc, gamejs, Game) {
-	var game = new Game();
+require(["domReady!", "gamejs", "game/game"], function(doc, gamejs, game) {
+	var game = game.getInstance();
 
 	gamejs.ready(function() {
 		gamejs.time.interval(game.gameTick, game);

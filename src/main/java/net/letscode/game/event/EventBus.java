@@ -2,6 +2,7 @@ package net.letscode.game.event;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -172,6 +173,30 @@ public class EventBus {
 				
 				registerMethod(o, m, priority, vetoable);
 			}
+		}
+	}
+	
+	/**
+	 * Removes the given object from all event queues that it may be a member
+	 * of. The object will immediately stop receiving events from this EventBus.
+	 * @param o the object to remove
+	 */
+	public void deregister(Object o) {
+		for (EventQueueDefinition def : definitions) {
+			// a queue for the entries to remove
+			// we can't remove them inline because we'd cause a
+			// ConcurrentModificationException
+			List<EventQueueEntry> removeQueue = new LinkedList<>();
+			
+			// find all entries to remove
+			for (EventQueueEntry e : def.getQueue()) {
+				if (e.getObject() == o) {
+					removeQueue.add(e);
+				}
+			}
+			
+			// remove them
+			def.getQueue().removeAll(removeQueue);
 		}
 	}
 	

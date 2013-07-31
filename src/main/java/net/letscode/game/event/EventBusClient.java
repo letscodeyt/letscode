@@ -25,9 +25,14 @@ public class EventBusClient {
 		bus.register(object);
 	}
 	
+	/**
+	 * Removes the given object from any event queues that it may be a
+	 * member of. The object will immediately cease to receive notifications
+	 * from this MessageBus.
+	 * @param object the object to remove
+	 */
 	public void deregister(Object object) {
-		// TODO
-		throw new UnsupportedOperationException("Not implemented yet.");
+		bus.deregister(object);
 	}
 	
 }

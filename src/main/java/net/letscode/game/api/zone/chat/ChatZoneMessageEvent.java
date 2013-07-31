@@ -1,7 +1,7 @@
 package net.letscode.game.api.zone.chat;
 
 import lombok.Getter;
-import net.letscode.game.api.entity.Entity;
+import lombok.ToString;
 import net.letscode.game.event.ContextualEvent;
 
 /**
@@ -9,20 +9,19 @@ import net.letscode.game.event.ContextualEvent;
  * entity has sent a message to the zone of interest.
  * @author timothyb89
  */
+@ToString(callSuper = true)
 public class ChatZoneMessageEvent extends ContextualEvent<ChatZone> {
 	
 	/**
 	 * The actual text of the message that was sent.
 	 */
 	@Getter
-	private final ChatMessage message;
+	private final ChatZoneMessage message;
 
-	public ChatZoneMessageEvent(ChatZone context, ChatMessage message) {
+	public ChatZoneMessageEvent(ChatZone context, ChatZoneMessage message) {
 		super(context);
 		
 		this.message = message;
 	}
-	
-	
 	
 }

@@ -1,7 +1,6 @@
 package net.letscode.game.event;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,10 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 public class EventQueueEntry implements Comparable<EventQueueEntry> {
 	
 	@Getter
-	public Object object;
+	private Object object;
 	
 	@Getter
-	public Method method;
+	private Method method;
 	
 	@Getter
 	private int priority;
@@ -56,40 +55,5 @@ public class EventQueueEntry implements Comparable<EventQueueEntry> {
 			log.error("Error in event handler " + method, ex);
 		}
 	}
-
-	@Override
-	public int hashCode() {
-		int hash = 7;
-		hash = 79 * hash + Objects.hashCode(this.object);
-		hash = 79 * hash + Objects.hashCode(this.method);
-		hash = 79 * hash + this.priority;
-		hash = 79 * hash + (this.vetoable ? 1 : 0);
-		return hash;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final EventQueueEntry other = (EventQueueEntry) obj;
-		if (!Objects.equals(this.object, other.object)) {
-			return false;
-		}
-		if (!Objects.equals(this.method, other.method)) {
-			return false;
-		}
-		if (this.priority != other.priority) {
-			return false;
-		}
-		if (this.vetoable != other.vetoable) {
-			return false;
-		}
-		return true;
-	}
-
 	
 }

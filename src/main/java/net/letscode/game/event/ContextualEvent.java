@@ -1,6 +1,7 @@
 package net.letscode.game.event;
 
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Defines an {@link Event} that occurs within some (generic) context. A context
@@ -10,6 +11,7 @@ import lombok.Getter;
  * @author timothyb89
  * @param <T> the type of context for the event
  */
+@ToString
 public class ContextualEvent<T> extends Event {
 	
 	@Getter

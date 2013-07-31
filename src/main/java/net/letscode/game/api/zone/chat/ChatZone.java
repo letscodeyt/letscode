@@ -1,5 +1,6 @@
 package net.letscode.game.api.zone.chat;
 
+import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.api.entity.Entity;
 import net.letscode.game.api.zone.Zone;
 
@@ -7,6 +8,7 @@ import net.letscode.game.api.zone.Zone;
  * A simple zone that implements basic chatroom functionality. Chat zones are
  * @author timothyb89
  */
+@Slf4j
 public class ChatZone extends Zone {
 
 	public ChatZone() {
@@ -60,7 +62,8 @@ public class ChatZone extends Zone {
 	/**
 	 * @param message the message to push to the zone
 	 */
-	public void chat(ChatMessage message) {
+	public void chat(ChatZoneMessage message) {
+		log.info("Pushing new message to bus: " + message);
 		bus.push(new ChatZoneMessageEvent(this, message));
 	}
 	

@@ -3,6 +3,7 @@ define(function(require) {
 	var gamejs = require("gamejs");
 	var Connection = require("./net/connection");
 	var ConnectScreen = require("./screen/connectscreen");
+	var ZoneScreen = require("./screen/zonescreen");
 	
 	var Game = Class.create({
 		initialize: function() {
@@ -11,6 +12,8 @@ define(function(require) {
 			this.bounds = new gamejs.Rect(0, 0, 800, 480);
 			
 			this.connection = new Connection();
+			this.initListeners();
+			
 			this.connection.connect();
 			//this.gameScreen = new TitleScreen();
 			this.gameScreen = new ConnectScreen();
@@ -26,6 +29,18 @@ define(function(require) {
 			this.startTime = new Date().getTime();
 			
 			this.debugFont = new gamejs.font.Font("10px Courier sans-serif");
+		},
+		
+		initListeners: function() {
+			var $this = this;
+			
+			this.connection.messageListener({
+				type: "state-change",
+				callback: function(message) {
+					console.log("state change: ", message);
+					$this.gameScreen = new ZoneScreen();
+				}
+			});
 		},
 		
 		gameTick: function(ms) {
@@ -61,5 +76,12 @@ define(function(require) {
 		}
 	});
 	
-	return Game;
+	// global singleton - can now use game.getInstance() from anywhere
+	var instance = new Game();
+	
+	return {
+		getInstance: function() {
+			return instance;
+		}
+	};
 });

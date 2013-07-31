@@ -2,6 +2,7 @@ package net.letscode.game.server;
 
 import java.io.File;
 import lombok.extern.slf4j.Slf4j;
+import net.letscode.game.api.world.World;
 import net.letscode.game.auth.shiro.MongoRealm;
 import net.letscode.game.config.Config;
 import net.letscode.game.db.Database;
@@ -13,7 +14,9 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
 /**
- *
+ * The WebServer class - essentially the main class for the server. This handles
+ * initialization and management of the Jetty process that the server runs off
+ * of.
  * @author timothyb89
  */
 @Slf4j
@@ -36,6 +39,9 @@ public class WebServer {
 		DefaultSecurityManager sm = new DefaultSecurityManager(realm);
 		SecurityUtils.setSecurityManager(sm);
 		
+		log.info("Initializing game world...");
+		World.get();
+		
 		log.info("Starting server on port " + port);
 		server = new Server(port);
 		initConnectors();
@@ -48,7 +54,7 @@ public class WebServer {
 		}
 	}
 
-	public static WebServer getInstance() {
+	public static WebServer get() {
 		if (instance == null) {
 			instance = new WebServer();
 		}

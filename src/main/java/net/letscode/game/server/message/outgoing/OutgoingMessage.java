@@ -33,6 +33,8 @@ public abstract class OutgoingMessage implements JsonSerializable {
 		g.writeStartObject();
 		g.writeStringField("type", type);
 		
+		serializeSubclass(g);
+		
 		g.writeEndObject();
 	}
 	

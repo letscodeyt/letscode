@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.api.entity.Entity;
 import net.letscode.game.api.util.JsonSerializable;
+import net.letscode.game.api.world.World;
 import net.letscode.game.auth.User;
 import net.letscode.game.event.EventBus;
 import net.letscode.game.event.EventBusClient;
@@ -114,7 +115,14 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 		
 		// for now, we'll just use a dummy entity and immediately put the player
 		// into the game
-		setEntity(new Entity());		
+		Entity dummy = new Entity();
+		
+		// join the default zone for now
+		World.get().getDefaultZone().addEntity(dummy);
+		
+		// do all the entity setting magic
+		setEntity(dummy);
+		
 		send(new StateChangeMessage(StateChangeMessage.STATE_ZONE));
 	}
 
@@ -193,6 +201,10 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 		
 		this.entity = entity;
 		
+		// initialize the entity controllers
+		adapter.putControllers(entity);
+		
+		// notify listeners
 		bus.push(new EntitySelectionEvent(this, old, entity));
 		
 		return old;

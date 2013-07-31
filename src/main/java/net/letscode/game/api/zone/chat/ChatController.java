@@ -8,6 +8,6 @@ import net.letscode.game.api.entity.Controller;
  */
 public interface ChatController extends Controller {
 
-	public void chat(ChatZone zone, ChatMessage message);
+	public void chat(ChatZone zone, ChatZoneMessage message);
 	
 }

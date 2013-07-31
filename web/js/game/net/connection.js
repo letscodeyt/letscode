@@ -25,14 +25,14 @@ define(function(require) {
 		 * for authentication.
 		 */
 		initListeners: function() {
-			this.messageListener({
+			/*this.messageListener({
 				type: "request",
 				name: "authenticate",
 				callback: function(message) {
 					console.log("creating AuthResponse for ", message);
 					new AuthenticationResponse(message);
 				}
-			});
+			});*/
 			
 			this.messageListener({
 				type: "notification",
@@ -42,6 +42,13 @@ define(function(require) {
 						type: message.class,
 						text: message.message
 					});
+				}
+			});
+			
+			this.messageListener({
+				type: "chat",
+				callback: function(message) {
+					console.log("chat message: ", message);
 				}
 			});
 		},
@@ -103,7 +110,6 @@ define(function(require) {
 					// match, the match fails
 					if (!data.hasOwnProperty(prop) || data[prop] !== l[prop]) {
 						notify = false;
-						console.log("match failed: ", l, data, "prop: " + prop);
 						break;
 					}
 				}

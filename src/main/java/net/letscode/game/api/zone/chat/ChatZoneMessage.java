@@ -8,7 +8,7 @@ import net.letscode.game.api.entity.Entity;
  * @author timothyb89
  */
 @Data
-public class ChatMessage {
+public class ChatZoneMessage {
 	
 	public static final String TYPE_ACTION = "action";
 	public static final String TYPE_NORMAL = "shout";

@@ -10,6 +10,7 @@ import net.letscode.game.event.EventHandler;
 import net.letscode.game.server.client.ClientSession;
 import net.letscode.game.server.client.IncomingMessageEvent;
 import net.letscode.game.server.message.incoming.AbstractMessageEvent;
+import net.letscode.game.server.message.incoming.ChatMessageEvent;
 
 /**
  * A {@code SessionListener} that handles the dispatching of all incoming
@@ -23,11 +24,15 @@ public class MessageDispatcher implements EventBusProvider {
 	private EventBus bus;
 	
 	public MessageDispatcher() {
-		bus = new EventBus();
+		bus = new EventBus() {{
+			add(ChatMessageEvent.class);
+		}};
 	}
 	
 	@EventHandler
 	public void onMessageReceived(IncomingMessageEvent event) {
+		log.info("Attempting to dispatch new message: " + event);
+		
 		JsonNode node = event.getMessage();
 		
 		// check the message type
