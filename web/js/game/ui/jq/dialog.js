@@ -12,7 +12,6 @@ define(function(require) {
 			// $.dialog(), but we can still provide some defaults
 			var options = Object.extend({
 				modal: true
-				
 			}, opts);
 			
 			this.dialog = $("<div>");

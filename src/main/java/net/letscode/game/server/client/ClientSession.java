@@ -147,6 +147,11 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 	public void onWebSocketClose(int statusCode, String reason) {
 		super.onWebSocketClose(statusCode, reason);
 		
+		// TODO: clean up, right now the player entity isn't disposed of
+		// properly
+		// cleanup should include the original player entity (account-bound)
+		// and any "summoned" entities
+		
 		log.info("Client " + getSession().getRemoteAddress() + " "
 				+ "closed connection, "
 				+ "status: " + statusCode + ", "

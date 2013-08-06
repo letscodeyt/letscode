@@ -11,6 +11,8 @@ import net.letscode.game.server.client.ClientSession;
 import net.letscode.game.server.client.IncomingMessageEvent;
 import net.letscode.game.server.message.incoming.AbstractMessageEvent;
 import net.letscode.game.server.message.incoming.ChatMessageEvent;
+import net.letscode.game.server.message.incoming.LoginMessageEvent;
+import net.letscode.game.server.message.incoming.RegistrationMessageEvent;
 
 /**
  * A {@code SessionListener} that handles the dispatching of all incoming
@@ -24,8 +26,13 @@ public class MessageDispatcher implements EventBusProvider {
 	private EventBus bus;
 	
 	public MessageDispatcher() {
+		// TODO: MessageHandlerFactory already scans these - it would be easy to
+		// make a list of Event classes and add them here automatically
+		
 		bus = new EventBus() {{
 			add(ChatMessageEvent.class);
+			add(LoginMessageEvent.class);
+			add(RegistrationMessageEvent.class);
 		}};
 	}
 	
@@ -65,6 +72,7 @@ public class MessageDispatcher implements EventBusProvider {
 					+ "constructor", ex);
 		} catch (MalformedMessageException ex) {
 			log.error("Client message was malformed", ex);
+			// TODO: possibly tell the client?
 		} catch (Exception ex) {
 			log.error("Could not initialize MessageHandler: " + clazz, ex);
 		}

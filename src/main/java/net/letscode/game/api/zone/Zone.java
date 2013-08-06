@@ -1,4 +1,4 @@
-package net.letscode.game.api.zone;
+ package net.letscode.game.api.zone;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
