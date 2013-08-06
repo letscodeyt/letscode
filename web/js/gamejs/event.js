@@ -252,11 +252,16 @@ exports.init = function() {
          (key >= exports.K_KP1  && key <= exports.K_KP9) ||
          key === exports.K_SPACE ||
          key === exports.K_TAB ||
-         key === exports.K_ENTER)) ||
-         key === exports.K_ALT ||
-         key === exports.K_BACKSPACE) {
+         key === exports.K_ENTER) ||
+	     key === exports.K_BACKSPACE) ||
+         key === exports.K_ALT) {
         ev.preventDefault();
       }
+	  
+	  // backspace should be allowed if focus is elsewhere (bugfix for upstream)
+	  // previously it was with K_ALT, outside of the second conditional, and
+	  // would catch _all_ backspace events, even if focus was on a different
+	  // element
    }
 
    function onKeyUp (ev) {
