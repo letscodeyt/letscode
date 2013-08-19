@@ -61,39 +61,5 @@
 			</div>
 			<div id="chat-log"></div>
 		</div>
-		
-		<script>
-			(function($) {
-				$(document).ready(function() {
-					var field = $("#chat-field");
-					var button = $("#chat-send");
-					var log = $("#chat-log");
-					
-					fakeMessage = function() {
-						// only scroll if already at the bottom
-						var scroll = (log.prop("scrollHeight") - log.scrollTop()
-								=== log.outerHeight());
-						
-						$("<p>", {
-							text: field.val()
-						}).appendTo(log);
-						field.val("");
-						
-						if (scroll) {
-							log.animate({
-								scrollTop: log.prop("scrollHeight")
-							}, 500);
-						}
-					};
-
-					button.click(fakeMessage);
-					field.keypress(function(event) {
-						if (event.which === 13) { // enter
-							fakeMessage();
-						}
-					});
-				});
-			})(jQuery);
-		</script>
 	</body>
 </html>

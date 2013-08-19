@@ -4,6 +4,7 @@ define(function(require) {
 	var Connection = require("./net/connection");
 	var ConnectScreen = require("./screen/connectscreen");
 	var ZoneScreen = require("./screen/zonescreen");
+	var ChatBox = require("./ui/jq/chatbox");
 	
 	var Game = Class.create({
 		initialize: function() {
@@ -13,11 +14,14 @@ define(function(require) {
 			
 			this.connection = new Connection();
 			this.initListeners();
-			
 			this.connection.connect();
+			
+			this.chatbox = new ChatBox({
+				connection: this.connection
+			});
+			
 			//this.gameScreen = new TitleScreen();
 			this.gameScreen = new ConnectScreen();
-			
 			this.surface = gamejs.display.setMode([
 				this.bounds.width,
 				this.bounds.height

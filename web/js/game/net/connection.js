@@ -44,13 +44,6 @@ define(function(require) {
 					});
 				}
 			});
-			
-			this.messageListener({
-				type: "chat",
-				callback: function(message) {
-					console.log("chat message: ", message);
-				}
-			});
 		},
 		
 		connect: function() {
