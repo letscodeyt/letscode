@@ -97,6 +97,9 @@ public class PlayerChatController implements ChatController {
 
 	@Override
 	public void onDeactivated(Entity e) {
+		// remove events
+		zone.bus().deregister(e);
+		
 		this.entity = null;
 		this.zone = null;
 	}

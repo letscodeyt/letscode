@@ -2,10 +2,12 @@ package net.letscode.game.api.entity;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
 import net.letscode.game.api.util.TargetedSerializable;
 import net.letscode.game.api.zone.Zone;
 import net.letscode.game.event.EventBus;
@@ -23,7 +25,7 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 	/**
 	 * A private list of zones that this entity is currently in. Note that this
 	 * list only stays in sync with the actual zone addition status and thus
-	 * adding a zone to this list should not cause 
+	 * adding a zone to this list should not cause any actual zone join event.
 	 */
 	private List<Zone> zones;
 	
@@ -45,6 +47,16 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 	@Override
 	public EventBusClient bus() {
 		return bus.getClient();
+	}
+	
+	/**
+	 * Gets the list of zones this entity is currently a member of. This list
+	 * can not be modified; {@link Zone#addEntity(Entity)} should be used to
+	 * join a zone instead.
+	 * @return an unmodifiable list of zones this entity is a member of
+	 */
+	public List<Zone> getZones() {
+		return Collections.unmodifiableList(zones);
 	}
 	
 	/**
@@ -111,6 +123,8 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 	 * (specifically, {@link Controller#onActivated(Entity)} is called) and it
 	 * can begin functioning. Any existing controller will first be deactivated,
 	 * and then returned.
+	 * <p>Note that a {@code null} implementation may be provided. In this case,
+	 * any existing controller is deactivated.</p>
 	 * @param <T> the controller type to register
 	 * @param clazz the class to provide an implementation for
 	 * @param impl the implementation to active
@@ -123,7 +137,7 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 			Class<T> clazz, Controller impl) {
 		// the controller class is checked at runtime, so it's safe to cast
 		// later
-		if (!clazz.isAssignableFrom(impl.getClass())) {
+		if (impl == null || !clazz.isAssignableFrom(impl.getClass())) {
 			throw new IllegalArgumentException(
 					"Attempted to register an incompatible controller for the "
 					+ "controller class " + clazz);
@@ -144,6 +158,16 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 		// we know that this should be castable, assuming that it was originally
 		// set using this method
 		return (T) old;
+	}
+	
+	/**
+	 * Deactivates and removes all controllers currently associated with this
+	 * Entity.
+	 */
+	public void purgeControllers() {
+		for (Class<? extends Controller> c : controllers.keySet()) {
+			setController(c, null);
+		}
 	}
 	
 	protected void serializeInternal(JsonGenerator g) throws IOException {

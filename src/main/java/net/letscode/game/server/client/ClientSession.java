@@ -6,12 +6,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.LinkedList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.api.entity.Entity;
 import net.letscode.game.api.util.JsonSerializable;
 import net.letscode.game.api.world.World;
+import net.letscode.game.api.zone.Zone;
 import net.letscode.game.auth.User;
 import net.letscode.game.event.EventBus;
 import net.letscode.game.event.EventBusClient;
@@ -156,6 +159,8 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 				+ "closed connection, "
 				+ "status: " + statusCode + ", "
 				+ "reason: " + reason);
+		
+		purgeSession();
 	}
 
 	@Override
@@ -164,6 +169,26 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 		
 		log.error(
 				"WebSocket error in " + getSession().getRemoteAddress(), cause);
+		
+		purgeSession();
+	}
+	
+	/**
+	 * Called when the client has disconnected, and starts the process of
+	 * removing their entity from the world, and otherwise cleaning up the
+	 * session.
+	 */
+	public void purgeSession() {
+		if (entity != null) {
+			entity.purgeControllers();
+			
+			List<Zone> zones = new LinkedList<>();
+			zones.addAll(entity.getZones());
+			
+			for (Zone z : zones) {
+				z.removeEntity(entity);
+			}
+		}
 	}
 	
 	/**
@@ -174,6 +199,10 @@ public class ClientSession extends WebSocketAdapter implements EventBusProvider 
 	public void send(JsonSerializable s) {
 		// TODO: use a WebSocketWriter here when it's been implemented by
 		// Jetty so we don't have to keep the whole message in memory.
+		if (isNotConnected()) {
+			log.error("Attempted to send a message to disconnected client!");
+			return;
+		}
 		
 		try {
 			// this throws an IOException but should never happen as no real
