@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import net.letscode.game.api.util.TargetedSerializable;
+import net.letscode.game.api.view.View;
 import net.letscode.game.api.zone.Zone;
 import net.letscode.game.event.EventBus;
 import net.letscode.game.event.EventBusClient;
@@ -31,12 +32,15 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 	
 	private Map<Class<? extends Controller>, Controller> controllers;
 	
+	private Map<Class<? extends Zone>, View<?>> views;
+	
 	protected EventBus bus;
 	
 	public Entity() {
 		zones = new LinkedList<>();
 		
 		controllers = new HashMap<>();
+		views = new HashMap<>();
 		
 		bus = new EventBus() {{
 			add(EntityZoneEnteredEvent.class);
@@ -168,6 +172,33 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 		for (Class<? extends Controller> c : controllers.keySet()) {
 			setController(c, null);
 		}
+	}
+	
+	/**
+	 * Gets this entity's View implementation for the given zone type.
+	 * @param <T> the zone type
+	 * @param zoneType the zone type's class reference
+	 * @return the current View implementation for the given zone type, or null
+	 */
+	public <T extends Zone> View<T> getView(Class<T> zoneType) {
+		return (View<T>) views.get(zoneType);
+	}
+	
+	/**
+	 * Sets this entity's View implementation for the given zone type.
+	 * @param <T> the zone type
+	 * @param zoneType the zone class, used for managing implementations
+	 * @param view the view implementation
+	 * @return the previous implementation, if any
+	 */
+	public <T extends Zone> View<T> setView(Class<T> zoneType, View<T> view) {
+		if (view == null) {
+			throw new IllegalArgumentException("Attempted to register null view.");
+		}
+		
+		View<T> old = (View<T>) views.put(zoneType, view);
+		
+		return old == null ? null : old;
 	}
 	
 	protected void serializeInternal(JsonGenerator g) throws IOException {
