@@ -170,6 +170,32 @@ public class Entity implements TargetedSerializable<Entity>, EventBusProvider {
 		}
 	}
 	
+	/**
+	 * Retrieves an external representation of this entity for the given zone.
+	 * This is intended to compliment the possibility of entities existing in
+	 * multiple zones concurrently, allowing them to "appear" differently in
+	 * each.
+	 * 
+	 * <p>Clients may decide how (and if) they would like to handle entities
+	 * defining an external representation. For example, in a 2D zone, clients
+	 * may decide to render the provided external entity view, but keep all
+	 * other properties of the original entity. Note that this functionality is
+	 * never guaranteed, and is not intended to provide any form of "security",
+	 * as the original (this) entity is still fully exposed to clients.</p>
+	 * 
+	 * <p>By default, this simply returns {@code null}; as such, clients should
+	 * be expected to display only the current entity.</p>
+	 * 
+	 * <p>TODO: this is currently unimplemented elsewhere, and is likely to be
+	 * ignored completely.</p>
+	 * @param zone the zone for which to retrieve an external representation
+	 * @return an (optionally used) external representation of this entity
+	 *     within the given zone, or null if none is defined.
+	 */
+	public Entity getRepresentationForZone(Zone zone) {
+		return null;
+	}
+	
 	protected void serializeInternal(JsonGenerator g) throws IOException {
 		
 	}
