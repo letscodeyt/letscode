@@ -1,8 +1,9 @@
 package net.letscode.game.api.zone.twod;
 
+import net.letscode.game.misc.QuadTreeItem;
 import lombok.Data;
 import net.letscode.game.api.entity.Entity;
-import net.letscode.game.misc.QuadTreeItem;
+import net.letscode.game.misc.QuadTree;
 
 /**
  * Defines the container for properties entities need to exist within 2D space.
@@ -18,5 +19,17 @@ public class EntityData2D implements QuadTreeItem {
 	private double y;
 	private double heading;
 	private double velocity;
+
+	private QuadTree parent;
+	
+	@Override
+	public QuadTree getQuadTreeParent() {
+		return parent;
+	}
+
+	@Override
+	public void setQuadTreeParent(QuadTree parent) {
+		this.parent = parent;
+	}
 	
 }

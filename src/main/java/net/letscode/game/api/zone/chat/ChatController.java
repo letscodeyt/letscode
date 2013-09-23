@@ -1,6 +1,6 @@
 package net.letscode.game.api.zone.chat;
 
-import net.letscode.game.api.entity.Controller;
+import net.letscode.game.api.controller.Controller;
 
 /**
  * Provides a simple chat controller than can be used by any entity.

@@ -1,4 +1,6 @@
-package net.letscode.game.api.entity;
+package net.letscode.game.api.controller;
+
+import net.letscode.game.api.entity.Entity;
 
 /**
  * Defines an abstract controller; that is, a set of requirements needed to

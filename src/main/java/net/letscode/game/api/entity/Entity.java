@@ -1,5 +1,6 @@
 package net.letscode.game.api.entity;
 
+import net.letscode.game.api.controller.Controller;
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.Collections;

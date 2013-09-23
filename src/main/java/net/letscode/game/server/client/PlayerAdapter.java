@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.letscode.game.api.controller.player.PlayerChatController;
-import net.letscode.game.api.entity.Controller;
+import net.letscode.game.api.controller.Controller;
 import net.letscode.game.api.entity.Entity;
 import net.letscode.game.api.zone.chat.ChatController;
 
