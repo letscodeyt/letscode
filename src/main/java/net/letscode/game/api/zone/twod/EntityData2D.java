@@ -3,6 +3,7 @@ package net.letscode.game.api.zone.twod;
 import net.letscode.game.misc.QuadTreeItem;
 import lombok.Data;
 import net.letscode.game.api.entity.Entity;
+import net.letscode.game.misc.Point;
 import net.letscode.game.misc.QuadTree;
 
 /**
@@ -15,12 +16,15 @@ import net.letscode.game.misc.QuadTree;
 public class EntityData2D implements QuadTreeItem {
 	
 	private Entity entity;
-	private double x;
-	private double y;
+	private Point position;
 	private double heading;
 	private double velocity;
 
 	private QuadTree parent;
+	
+	public EntityData2D(Entity entity) {
+		this.entity = entity;
+	}
 	
 	@Override
 	public QuadTree getQuadTreeParent() {
@@ -30,6 +34,16 @@ public class EntityData2D implements QuadTreeItem {
 	@Override
 	public void setQuadTreeParent(QuadTree parent) {
 		this.parent = parent;
+	}
+
+	@Override
+	public double getX() {
+		return position.y;
+	}
+
+	@Override
+	public double getY() {
+		return position.x;
 	}
 	
 }
