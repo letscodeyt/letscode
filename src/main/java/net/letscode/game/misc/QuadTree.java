@@ -32,20 +32,17 @@ import lombok.ToString;
  */
 public class QuadTree<T extends QuadTreeItem> implements Iterable<T> {
 
-	@Getter
-	private int maxDepth;
-	@Getter
-	private int depth;
-	@Getter
-	private QuadTree root;
-	@Getter
-	private QuadTree parent;
-	@Getter
-	private Boundry2D boundry;
+	@Getter private int maxDepth;
+	@Getter private int depth;
+	@Getter private QuadTree root;
+	@Getter private QuadTree parent;
+	@Getter private Boundry2D boundry;
+	
 	private QuadTree<T> northWest;
 	private QuadTree<T> northEast;
 	private QuadTree<T> southWest;
 	private QuadTree<T> southEast;
+	
 	/**
 	 * The list of children. This is only ever used if this tree is a leaf node
 	 */

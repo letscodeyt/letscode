@@ -41,7 +41,7 @@ public abstract class AbstractMessageEvent extends Event {
 		
 		if (!field.isTextual()) {
 			throw new MalformedMessageException(
-					"Found a non-textual field where text was expected..");
+					"Found a non-textual field where text was expected.");
 		}
 		
 		if (!allowEmpty && field.asText().isEmpty()) {

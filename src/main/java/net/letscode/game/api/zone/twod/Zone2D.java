@@ -25,6 +25,8 @@ public class Zone2D extends Zone {
 	public Zone2D(Boundry2D bounds, int treeDepth) {
 		this.bounds = bounds;
 		
+		bus.add(Zone2DMovementEvent.class);
+		
 		dataMap = new HashMap<>();
 		entityMap = new QuadTree<>(bounds, treeDepth);
 	}
