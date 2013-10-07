@@ -12,8 +12,9 @@ import net.letscode.game.server.message.incoming.ChatMessageEvent;
 import net.letscode.game.server.message.outgoing.ChatMessage;
 
 /**
- * Defines a basic player chat controller, which handles messages coming from
- * a client, and dispatches them to the {@link ChatZone} for the player entity.
+ * Defines a player chat controller, which dispatches incoming messages from a
+ * particular client to the zone they're in, and pushes other messages from the
+ * zone back to the associated client.
  * <p>Note that the this controller is specific to the client; a new controller
  * would need to be created to be used with a different ClientSession.</p>
  * @author timothyb89
