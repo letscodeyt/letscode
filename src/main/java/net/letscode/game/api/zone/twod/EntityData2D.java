@@ -16,7 +16,7 @@ import net.letscode.game.misc.QuadTree;
 public class EntityData2D implements QuadTreeItem {
 	
 	private Entity entity;
-	private Point position;
+	private Point position; // bounds are part of the View
 	private double heading;
 	private double velocity;
 
