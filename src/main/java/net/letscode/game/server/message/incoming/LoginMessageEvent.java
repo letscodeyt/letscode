@@ -16,11 +16,9 @@ import net.letscode.game.server.message.MessageHandler;
 @MessageHandler("login")
 public class LoginMessageEvent extends AbstractMessageEvent {
 
-	@Getter
-	private final String username;
+	@Getter private final String username;
 	
-	@Getter
-	private final String password;
+	@Getter private final String password;
 	
 	public LoginMessageEvent(ClientSession session, JsonNode node) {
 		super(session, node);

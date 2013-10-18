@@ -5,7 +5,11 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Defines an entry in the event queue for a specific event type
+ * Defines an entry in the event queue for a specific event type.
+ * TODO: should we use WeakReferences here? we could potentially avoid having to
+ * ever manually deregister a class from event notifications, and just queue
+ * "expired" event listeners for removal if we see they've been garbage
+ * collected
  * @author timothyb89
  */
 @Slf4j
