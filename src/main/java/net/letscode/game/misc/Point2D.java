@@ -7,17 +7,17 @@ import lombok.ToString;
  * @author timothyb
  */
 @ToString
-public class Point {
+public class Point2D {
 
 	public double x;
 	public double y;
 
-	public Point() {
+	public Point2D() {
 		x = 0;
 		y = 0;
 	}
 
-	public Point(double x, double y) {
+	public Point2D(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -31,8 +31,8 @@ public class Point {
 	 * @param origin the origin
 	 * @return a localized instance of this point relative to the origin
 	 */
-	public Point localize(Point origin) {
-		return new Point(
+	public Point2D localize(Point2D origin) {
+		return new Point2D(
 				x + -1 * (origin.x),
 				y + -1 * (origin.y));
 	}

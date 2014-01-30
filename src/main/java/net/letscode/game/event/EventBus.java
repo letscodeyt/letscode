@@ -108,6 +108,22 @@ public class EventBus {
 	}
 	
 	/**
+	 * Pushes the given event to the bus, but only notifies those with a
+	 * priority flag greater than or equal to the given {@code priority}. Note
+	 * that the default priority is {@link EventPriority#NORMAL} (0).
+	 * @see #push(Event) 
+	 * @see EventPriority
+	 * @param event the event to push
+	 * @param priority the minimum event priority 
+	 */
+	public void push(Event event, int priority) {
+		EventQueueDefinition def = getQueueForClass(event.getClass());
+		if (def != null) {
+			def.push(event, priority);
+		}
+	}
+	
+	/**
 	 * Registers the given method to the event bus. The object is assumed to be
 	 * of the class that contains the given method.
 	 * <p>The method parameters are

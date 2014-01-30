@@ -5,10 +5,12 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.letscode.game.api.entity.Entity;
+import net.letscode.game.api.world.WorldTickEvent;
 import net.letscode.game.misc.QuadTree;
 import net.letscode.game.api.zone.Zone;
+import net.letscode.game.event.EventHandler;
 import net.letscode.game.misc.Boundry2D;
-import net.letscode.game.misc.Point;
+import net.letscode.game.misc.Point2D;
 
 /**
  * Defines a Zone in which entities are placed in a continuous 2d plane. 
@@ -75,23 +77,39 @@ public class Zone2D extends Zone {
 	}
 	
 	/**
-	 * Moves the specified entity to the given position within this zone.
+	 * Immediately moves the specified entity to the given position within this
+	 * zone.
 	 * @param e the entity to move
 	 * @param pos the new location for the entity
 	 */
-	public void move(Entity e, Point pos) {
+	public void move(Entity e, Point2D pos) {
 		EntityData2D data = dataMap.get(e);
 		if (data == null) {
 			throw new IllegalArgumentException("Attempted to move entity not "
 					+ "currently in this zone.");
 		}
 		
-		Point start = data.getPosition();
+		Point2D start = data.getPosition();
 		data.setPosition(pos);
 		
 		entityMap.update(data);
 		
 		bus.push(new Zone2DMovementEvent(data, start, pos));
+	}
+	
+	@EventHandler
+	public void tick(WorldTickEvent event) {
+		updateEntities();
+	}
+	
+	/**
+	 * Updates entities within the zone. This is generally called only on server
+	 * ticks, but should be safe to call from other contexts.
+	 */
+	protected void updateEntities() {
+		// TODO
+		// - handle entity movement
+		// - ai?
 	}
 	
 }

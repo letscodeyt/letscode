@@ -189,7 +189,7 @@ public class QuadTree<T extends QuadTreeItem> implements Iterable<T> {
 					"Can't insert item into tree twice; remove it first.");
 		}
 
-		Point ip = new Point(item.getX(), item.getY());
+		Point2D ip = new Point2D(item.getX(), item.getY());
 
 		if (!boundry.contains(ip)) {
 			throw new IllegalArgumentException(
@@ -197,7 +197,7 @@ public class QuadTree<T extends QuadTreeItem> implements Iterable<T> {
 					+ "within " + boundry);
 		}
 
-		Point l = ip.localize(boundry.getPosition());
+		Point2D l = ip.localize(boundry.getPosition());
 
 		if (depth < maxDepth) {
 			// recurse to the appropriate quadrant

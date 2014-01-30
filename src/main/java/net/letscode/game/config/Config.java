@@ -65,6 +65,7 @@ public class Config {
 		
 		public int port = 8333;
 		public String webDirectory = "./web";
+		public long tickRate = 15;
 		
 	}
 	

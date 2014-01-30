@@ -35,8 +35,8 @@ public class Boundry2D {
 		this.height = height;
 	}
 
-	public Point getPosition() {
-		return new Point(x, y);
+	public Point2D getPosition() {
+		return new Point2D(x, y);
 	}
 
 	public boolean contains(double x, double y) {
@@ -47,7 +47,7 @@ public class Boundry2D {
 				&& (y >= this.y - halfHeight && y <= this.y + halfHeight);
 	}
 
-	public boolean contains(Point p) {
+	public boolean contains(Point2D p) {
 		return contains(p.x, p.y);
 	}
 }

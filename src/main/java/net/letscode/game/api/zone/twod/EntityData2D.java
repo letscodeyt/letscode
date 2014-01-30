@@ -3,7 +3,7 @@ package net.letscode.game.api.zone.twod;
 import net.letscode.game.misc.QuadTreeItem;
 import lombok.Data;
 import net.letscode.game.api.entity.Entity;
-import net.letscode.game.misc.Point;
+import net.letscode.game.misc.Point2D;
 import net.letscode.game.misc.QuadTree;
 
 /**
@@ -16,7 +16,7 @@ import net.letscode.game.misc.QuadTree;
 public class EntityData2D implements QuadTreeItem {
 	
 	private Entity entity;
-	private Point position; // bounds are part of the View
+	private Point2D position; // bounds are part of the View
 	private double heading;
 	private double velocity;
 

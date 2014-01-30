@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class SetBench extends Object {
 	
-	public static final int ELEMENTS = 100000;
+	public static final int ELEMENTS = 1000;
 	
 	private Collection<Integer> collection;
 	
